@@ -35,24 +35,41 @@
       gap: 24px;
       padding: 24px clamp(16px, 5vw, 64px);
     }
-    .logos a { display: block; }
+    .logos a {
+      display: block;
+      padding: 8px 10px;
+      margin: -8px -10px;
+      transition: background .15s;
+    }
+    .logos a img { transition: filter .15s; }
+    .logos a:hover, .logos a:focus-visible { background: var(--fg); }
+    .logos a:hover img, .logos a:focus-visible img { filter: invert(1); }
     .logos img { height: clamp(28px, 5vw, 56px); width: auto; display: block; }
 
-    /* 2 + 3. Typewriter headline and CTA */
-    main {
+    /* Stage: black page with the official color art anchored bottom; copy stays in the black area */
+    .stage {
       flex: 1;
+      display: flex;
+      background: #000 url("assets/innovation-art.webp") center bottom / 100% auto no-repeat;
+      min-height: calc(100vw * 1009 / 1559); /* always tall enough to show the full art */
+    }
+    main {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      justify-content: center;
       gap: 40px;
-      padding: 12vh clamp(16px, 5vw, 64px);
-      max-width: 1200px;
+      padding: 6vh clamp(16px, 5vw, 64px);
+      width: 55%;           /* keeps copy left of the color swoosh */
+      max-width: 1000px;
+    }
+    @media (max-width: 800px) {
+      .stage { padding-bottom: calc(100vw * 1009 / 1559); min-height: 0; }
+      main { width: 100%; max-width: none; padding-top: 6vh; padding-bottom: 6vh; }
     }
     .typewriter {
       margin: 0;
       font-weight: 500;
-      font-size: clamp(28px, 5vw, 64px);
+      font-size: clamp(26px, 3.6vw, 56px);
       line-height: 1.15;
       letter-spacing: -0.01em;
       min-height: 4.6em; /* reserve space so the button doesn't jump while typing */
@@ -82,11 +99,6 @@
     }
     .cta:hover, .cta:focus-visible { background: var(--fg); color: #000; }
 
-    /* 4. Colorful bottom band, taken from the social graphic */
-    .flow {
-      aspect-ratio: 2000 / 414;
-      background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat;
-    }
   </style>
 </head>
 <body>
@@ -97,12 +109,12 @@
     <a href="https://velocitytx.org" target="_blank" rel="noopener"><img src="assets/logo-velocitytx.png" alt="VelocityTX"></a>
   </header>
 
+  <div class="stage">
   <main>
     <h1 class="typewriter" id="headline" aria-label="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes."><span id="typed"></span><span class="cursor" aria-hidden="true"></span></h1>
     <a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">Register Here</a>
   </main>
-
-  <div class="flow" aria-hidden="true"></div>
+  </div>
 
   <script>
     // Types once per page load; cursor keeps blinking afterward (CSS).
