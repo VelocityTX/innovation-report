@@ -1,1 +1,137 @@
-﻿<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Innovation Report</title></head><body><h1>Innovation Report</h1><p>Coming soon.</p></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>San Antonio &amp; the State of Innovation</title>
+  <meta name="description" content="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes.">
+  <style>
+    @font-face {
+      font-family: "Neue Haas Grotesk Text";
+      src: url("assets/NeueHaasGroteskText-65Medium-Trial.otf") format("opentype");
+      font-weight: 500;
+      font-display: swap;
+    }
+    :root { --bg: #000; --fg: #fff; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); }
+    body {
+      font-family: "Neue Haas Grotesk Text", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 1. Anchored consortium logos */
+    .logos {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px clamp(16px, 5vw, 64px);
+    }
+    .logos img { height: clamp(28px, 5vw, 56px); width: auto; display: block; }
+
+    /* 2 + 3. Typewriter headline and CTA */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 40px;
+      padding: 12vh clamp(16px, 5vw, 64px);
+      max-width: 1200px;
+    }
+    .typewriter {
+      margin: 0;
+      font-weight: 500;
+      font-size: clamp(28px, 5vw, 64px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      min-height: 4.6em; /* reserve space so the button doesn't jump while typing */
+    }
+    .cursor {
+      display: inline-block;
+      width: 0.08em;
+      height: 0.95em;
+      margin-left: 0.08em;
+      background: var(--fg);
+      vertical-align: -0.1em;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .cta {
+      display: inline-block;
+      padding: 16px 32px;
+      border: 2px solid var(--fg);
+      color: var(--fg);
+      background: transparent;
+      font: inherit;
+      font-size: 20px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: background .15s, color .15s;
+    }
+    .cta:hover, .cta:focus-visible { background: var(--fg); color: #000; }
+
+    /* 4. Colorful bottom band, recreated from the social graphic */
+    .flow {
+      position: relative;
+      height: clamp(220px, 38vw, 480px);
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 60% 90% at 8% 100%, #1fa97a 0%, transparent 60%),
+        radial-gradient(ellipse 70% 80% at 25% 85%, #1e7ee0 0%, transparent 70%),
+        radial-gradient(ellipse 60% 90% at 95% 100%, #1b3fc4 0%, transparent 70%),
+        radial-gradient(ellipse 45% 70% at 88% 55%, #b13fd6 0%, transparent 70%),
+        linear-gradient(100deg, #1e7ee0 0%, #ff9a3c 40%, #ff5a1f 62%, #e83e8c 88%, #8a3fd6 100%);
+    }
+    /* black curve sweeping across the top of the band */
+    .flow::before {
+      content: "";
+      position: absolute;
+      left: -25%; top: -190%;
+      width: 130%; height: 270%;
+      background: #000;
+      border-radius: 50%;
+      transform: rotate(-14deg);
+    }
+  </style>
+</head>
+<body>
+  <header class="logos" aria-label="Consortium members">
+    <img src="assets/logo-geekdom.png" alt="Geekdom">
+    <img src="assets/logo-port-san-antonio.png" alt="Port San Antonio">
+    <img src="assets/logo-techbloc.png" alt="Tech Bloc">
+    <img src="assets/logo-velocitytx.png" alt="VelocityTX">
+  </header>
+
+  <main>
+    <h1 class="typewriter" id="headline" aria-label="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes."><span id="typed"></span><span class="cursor" aria-hidden="true"></span></h1>
+    <a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">Register Here</a>
+  </main>
+
+  <div class="flow" aria-hidden="true"></div>
+
+  <script>
+    // Types once per page load; cursor keeps blinking afterward (CSS).
+    (function () {
+      var text = "San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes.";
+      var el = document.getElementById("typed");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = text; return; }
+      var i = 0;
+      (function tick() {
+        el.textContent = text.slice(0, ++i);
+        if (i < text.length) setTimeout(tick, 45 + Math.random() * 45);
+      })();
+    })();
+  </script>
+</body>
+</html>
