@@ -81,27 +81,10 @@
     }
     .cta:hover, .cta:focus-visible { background: var(--fg); color: #000; }
 
-    /* 4. Colorful bottom band, recreated from the social graphic */
+    /* 4. Colorful bottom band, taken from the social graphic */
     .flow {
-      position: relative;
-      height: clamp(220px, 38vw, 480px);
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse 60% 90% at 8% 100%, #1fa97a 0%, transparent 60%),
-        radial-gradient(ellipse 70% 80% at 25% 85%, #1e7ee0 0%, transparent 70%),
-        radial-gradient(ellipse 60% 90% at 95% 100%, #1b3fc4 0%, transparent 70%),
-        radial-gradient(ellipse 45% 70% at 88% 55%, #b13fd6 0%, transparent 70%),
-        linear-gradient(100deg, #1e7ee0 0%, #ff9a3c 40%, #ff5a1f 62%, #e83e8c 88%, #8a3fd6 100%);
-    }
-    /* black curve sweeping across the top of the band */
-    .flow::before {
-      content: "";
-      position: absolute;
-      left: -25%; top: -190%;
-      width: 130%; height: 270%;
-      background: #000;
-      border-radius: 50%;
-      transform: rotate(-14deg);
+      aspect-ratio: 1600 / 670;
+      background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat;
     }
   </style>
 </head>
