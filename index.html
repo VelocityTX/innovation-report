@@ -35,6 +35,7 @@
       gap: 24px;
       padding: 24px clamp(16px, 5vw, 64px);
     }
+    .logos a { display: block; }
     .logos img { height: clamp(28px, 5vw, 56px); width: auto; display: block; }
 
     /* 2 + 3. Typewriter headline and CTA */
@@ -90,10 +91,10 @@
 </head>
 <body>
   <header class="logos" aria-label="Consortium members">
-    <img src="assets/logo-geekdom.png" alt="Geekdom">
-    <img src="assets/logo-port-san-antonio.png" alt="Port San Antonio">
-    <img src="assets/logo-techbloc.png" alt="Tech Bloc">
-    <img src="assets/logo-velocitytx.png" alt="VelocityTX">
+    <a href="https://www.geekdom.com" target="_blank" rel="noopener"><img src="assets/logo-geekdom.png" alt="Geekdom"></a>
+    <a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img src="assets/logo-port-san-antonio.png" alt="Port San Antonio"></a>
+    <a href="https://www.techbloc.org" target="_blank" rel="noopener"><img src="assets/logo-techbloc.png" alt="Tech Bloc"></a>
+    <a href="https://velocitytx.org" target="_blank" rel="noopener"><img src="assets/logo-velocitytx.png" alt="VelocityTX"></a>
   </header>
 
   <main>
@@ -109,10 +110,14 @@
       var text = "San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes.";
       var el = document.getElementById("typed");
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = text; return; }
+      var PAUSE_AFTER = "economy."; // dramatic beat here
+      var PAUSE_MS = 1100;
       var i = 0;
       (function tick() {
         el.textContent = text.slice(0, ++i);
-        if (i < text.length) setTimeout(tick, 45 + Math.random() * 45);
+        if (i >= text.length) return;
+        var pause = text.slice(0, i).endsWith(PAUSE_AFTER) ? PAUSE_MS : 0;
+        setTimeout(tick, pause + 45 + Math.random() * 45);
       })();
     })();
   </script>
