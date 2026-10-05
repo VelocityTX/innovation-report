@@ -53,15 +53,14 @@
       /* art is anchored to the bottom and may be cropped at the top (tucks under the sticky logo bar) */
       background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat;
       /* reserve room under the copy for the blue hump (~1/3 of the art's height) */
-      padding-bottom: calc(max(100vw * 1009 / 1559, 100vh) * 0.33);
+      padding-bottom: calc(max(100vw * 1009 / 1559, 100vh) * 0.305);
     }
     main {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 40px;
       padding: 6vh clamp(16px, 5vw, 64px) 0;
-      width: 62%;           /* keeps copy left of the color swoosh */
+      width: 66%;           /* keeps copy left of the color swoosh */
       max-width: 1000px;
     }
     @media (max-width: 800px) {
@@ -71,10 +70,10 @@
     .typewriter {
       margin: 0;
       font-weight: 500;
-      font-size: clamp(26px, 3.6vw, 56px);
+      font-size: clamp(26px, 3.3vw, 56px);
       line-height: 1.15;
       letter-spacing: -0.01em;
-      min-height: 4.6em; /* reserve space so the button doesn't jump while typing */
+      min-height: 3.45em; /* reserve space so the button doesn't jump while typing */
       white-space: pre-wrap;
     }
     .cursor {
@@ -87,6 +86,8 @@
       animation: blink 1s steps(1) infinite;
     }
     @keyframes blink { 50% { opacity: 0; } }
+    /* button sits centered between the headline and the top of the blue hump */
+    .cta-wrap { flex: 1; display: flex; align-items: center; min-height: 140px; }
     .cta {
       display: inline-block;
       padding: 16px 32px;
@@ -115,14 +116,16 @@
   <div class="stage">
   <main>
     <h1 class="typewriter" id="headline" aria-label="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes."><span id="typed"></span><span class="cursor" aria-hidden="true"></span></h1>
-    <a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">Register Here</a>
+    <div class="cta-wrap"><a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">Register Here</a></div>
   </main>
   </div>
 
   <script>
     // Types once per page load; cursor keeps blinking afterward (CSS).
     (function () {
-      var text = "San Antonio has never had a shared baseline for its innovation economy.\nOn November 4, that changes.";
+      var text = "San Antonio has never had a shared\nbaseline for its innovation economy.\nOn November 4, that changes.";
+      // on narrow screens let the first sentence wrap naturally
+      if (window.matchMedia("(max-width: 800px)").matches) text = text.replace("shared\nbaseline", "shared baseline");
       var el = document.getElementById("typed");
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = text; return; }
       var PAUSE_AFTER = "economy."; // dramatic beat here
