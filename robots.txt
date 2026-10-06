@@ -1,0 +1,10 @@
+# Search crawling is allowed. /old is an archive marked noindex in its own <head>;
+# it stays crawlable so crawlers can see that.
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://innovation-report-pmc6.vercel.app/sitemap.xml

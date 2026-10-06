@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <base href="/old/">
+  <meta name="robots" content="noindex, follow">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>San Antonio &amp; the State of Innovation</title>
+  <meta name="description" content="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes.">
+  <style>
+    @font-face {
+      font-family: "Neue Haas Grotesk Text";
+      src: url("assets/NeueHaasGroteskText-65Medium-Trial.otf") format("opentype");
+      font-weight: 500;
+      font-display: swap;
+    }
+    :root { --bg: #000; --fg: #fff; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); }
+    body {
+      font-family: "Neue Haas Grotesk Text", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 1. Anchored consortium logos */
+    .logos {
+      --logo-height: clamp(24px, 4vw, 56px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(10px, 3vw, 24px);
+      padding: 24px clamp(16px, 5vw, 64px);
+    }
+    .logos a {
+      display: block;
+      padding: 8px 10px;
+      margin: -8px -10px;
+      transition: background .15s;
+    }
+    .logos a img { transition: filter .15s; }
+    .logos a:hover, .logos a:focus-visible { background: var(--fg); }
+    .logos a:hover img, .logos a:focus-visible img { filter: invert(1); }
+    .logos img { height: var(--logo-height); width: auto; display: block; }
+    /* Balance the visual weight of wide wordmarks and taller logo shapes. */
+    .logos .logo-port { height: calc(var(--logo-height) * 1.12); }
+    .logos .logo-techbloc { height: calc(var(--logo-height) * 1.35); }
+    .logos .logo-velocitytx { height: calc(var(--logo-height) * 1.6); }
+
+    /* Stage: black page with the official color art anchored bottom; copy stays in the black area */
+    .stage {
+      flex: 1;
+      display: flex;
+      /* Keep the art anchored to the bottom of the page. */
+      background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat;
+      /* reserve room under the copy for the blue hump (~1/3 of the art's height) */
+      padding-bottom: calc(max(100vw * 1009 / 1559, 100vh) * 0.305);
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 6vh clamp(16px, 5vw, 64px) 0;
+      width: 80%;
+      max-width: 1440px;
+    }
+    @media (min-width: 801px) {
+      /* Use one continuous background behind the logos and content. */
+      body { background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat; }
+      .logos, .stage { background: transparent; }
+    }
+    @media (max-width: 800px) {
+      body { min-height: 100svh; }
+      /* Reserve only the colored wave's height so the stage fits the phone screen. */
+      .stage { background-size: 100% auto; padding-bottom: calc(100vw * 1009 / 1559 * 0.305); }
+      main { width: 100%; max-width: none; padding-top: 10svh; padding-bottom: 4svh; }
+    }
+    .typewriter {
+      margin: 0;
+      font-weight: 500;
+      font-size: clamp(20.8px, 2.64vw, 44.8px);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      min-height: 3.45em; /* reserve space so the button doesn't jump while typing */
+    }
+    @media (max-width: 800px) {
+      .typewriter { font-size: clamp(28px, 5.5vw, 40px); line-height: 1.2; }
+    }
+    .cursor {
+      display: inline-block;
+      width: 0.08em;
+      height: 0.95em;
+      margin-left: 0.08em;
+      background: var(--fg);
+      vertical-align: -0.1em;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    /* button sits centered between the headline and the top of the blue hump */
+    .cta-wrap { flex: 1; display: flex; align-items: center; min-height: 140px; }
+    .cta {
+      display: inline-block;
+      padding: 16px 32px;
+      border: 2px solid var(--fg);
+      color: var(--fg);
+      background: transparent;
+      font: inherit;
+      font-size: 20px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: background .15s, color .15s;
+    }
+    .cta:hover, .cta:focus-visible { background: var(--fg); color: #000; }
+
+  </style>
+</head>
+<body>
+  <header class="logos" aria-label="Consortium members">
+    <a href="https://www.geekdom.com" target="_blank" rel="noopener"><img src="assets/logo-geekdom.png" alt="Geekdom"></a>
+    <a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img class="logo-port" src="assets/logo-port-san-antonio.png" alt="Port San Antonio"></a>
+    <a href="https://satechbloc.com/" target="_blank" rel="noopener"><img class="logo-techbloc" src="assets/logo-techbloc.png" alt="Tech Bloc"></a>
+    <a href="https://velocitytx.org" target="_blank" rel="noopener"><img class="logo-velocitytx" src="assets/logo-velocitytx.png" alt="VelocityTX"></a>
+  </header>
+
+  <div class="stage">
+  <main>
+    <h1 class="typewriter" id="headline" aria-label="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes."><span id="intro">San Antonio has never had a shared baseline for its innovation economy.</span><br><br><span id="typed"></span><span class="cursor" aria-hidden="true"></span></h1>
+    <div class="cta-wrap"><a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">JOIN THE CONVERSATION</a></div>
+  </main>
+  </div>
+
+  <script>
+    // Types once per page load; cursor keeps blinking afterward (CSS).
+    (function () {
+      var text = "On November 4, that changes.";
+      var el = document.getElementById("typed");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = text; return; }
+      var i = 0;
+      (function tick() {
+        el.textContent = text.slice(0, ++i);
+        if (i >= text.length) return;
+        setTimeout(tick, 45 + Math.random() * 45);
+      })();
+    })();
+  </script>
+</body>
+</html>
