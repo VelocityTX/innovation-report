@@ -1,28 +1,39 @@
-// Liquid Glass CTA.
+// Liquid Glass for the RSVP CTA and the background Play/Pause control.
 //
-// A small WebGL lens drawn behind the CTA label. It samples the same ribbon the
-// visitor sees (the playing/paused <video>, otherwise the static poster), maps
-// the CTA's position into that artwork using the same object-fit/position as the
-// CSS, and refracts it through a pill-shaped lens using the Figma Glass settings:
-// refraction 1, depth 100, dispersion 0.5, light −45° at 0.8, no frost, and the
-// #017ADB @ 30% fill. The link itself never depends on any of this.
+// Each target gets a small WebGL lens drawn behind its label/icon. The lens samples
+// the same ribbon the visitor sees (the playing/paused <video>, otherwise the static
+// poster), maps the element's position into that artwork using the same
+// object-fit/position as the CSS, and refracts it through a pill/circle-shaped lens
+// using the Figma Glass settings: refraction 1, depth 100, dispersion 0.5, light −45°
+// at 0.8, no frost, and the #017ADB @ 30% fill. The controls never depend on this.
 (function () {
   "use strict";
 
   var root = document.documentElement;
-  var cta = document.querySelector(".cta");
   var ribbon = document.querySelector(".ribbon");
   var img = ribbon && ribbon.querySelector("img");
   var video = ribbon && ribbon.querySelector("video");
 
+  // shade: extra darkening of the lens. The CTA uses Figma's glass as-is. The toggle
+  // sits over the brightest part of the ribbon on desktop, so its lens is 20% deeper
+  // to keep the white icon above 3:1 in every video frame (measured: ≥ 3.75:1).
+  var TARGETS = [
+    { selector: ".cta", shade: 0 },
+    { selector: ".motion-toggle", shade: 0.2 }
+  ];
+  var elements = TARGETS.map(function (t) { return document.querySelector(t.selector); });
+
   function fallback() {
     root.classList.remove("glass-pending");
-    if (cta) cta.classList.remove("is-glass");
-    var c = cta && cta.querySelector("canvas");
-    if (c) c.remove();
+    elements.forEach(function (el) {
+      if (!el) return;
+      el.classList.remove("is-glass");
+      var c = el.querySelector(":scope > canvas");
+      if (c) c.remove();
+    });
   }
 
-  if (!cta || !img || !video || !root.classList.contains("glass-pending")) return fallback();
+  if (!img || !video || !root.classList.contains("glass-pending")) return fallback();
 
   var VERT = [
     "attribute vec2 a_pos;",
@@ -38,10 +49,11 @@
     "varying vec2 v_uv;",
     "uniform sampler2D u_tex;",
     "uniform float u_hasTex;",
-    "uniform vec2 u_size;",    // CTA size, CSS px
-    "uniform vec2 u_offset;",  // CTA top-left relative to the drawn artwork, CSS px
+    "uniform vec2 u_size;",    // element size, CSS px
+    "uniform vec2 u_offset;",  // element top-left relative to the drawn artwork, CSS px
     "uniform vec2 u_draw;",    // drawn artwork size, CSS px
     "uniform float u_dpr;",
+    "uniform float u_shade;",
     "",
     "const float REFRACTION = 1.0;",
     "const float DISPERSION = 0.5;",
@@ -50,6 +62,7 @@
     "const vec3 TINT = vec3(1.0, 122.0, 219.0) / 255.0;",
     "const float TINT_ALPHA = 0.3;",
     "",
+    // Rounded box with radius = half the height: a pill, or a circle when square.
     "float pill(vec2 p, vec2 halfSize) {",
     "  float r = halfSize.y;",
     "  vec2 q = abs(p) - halfSize + r;",
@@ -76,7 +89,7 @@
     "",
     // Depth 100 → the whole half-height is bevelled. A squircle-style profile keeps
     // the centre flat and bends light hardest at the rim, pulling in the artwork
-    // just outside the pill.
+    // just outside the shape.
     "  float bevel = halfSize.y;",
     "  float t = clamp(-d / bevel, 0.0, 1.0);",
     "  float bend = pow(1.0 - t, 3.0);",
@@ -87,7 +100,7 @@
     "  col.g = backdrop(px + shift).g;",
     "  col.b = backdrop(px + shift * (1.0 - spread)).b;",
     "",
-    "  col = mix(col, TINT, TINT_ALPHA);",
+    "  col = mix(col, TINT, TINT_ALPHA) * (1.0 - u_shade);",
     "",
     // Specular rim: bright where the edge faces the light, fainter on the far side.
     "  float facing = dot(n, LIGHT_DIR);",
@@ -101,113 +114,136 @@
     "}"
   ].join("\n");
 
-  var canvas = document.createElement("canvas");
-  canvas.setAttribute("aria-hidden", "true");
-  var gl;
-  try {
-    gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: false });
-  } catch (e) { gl = null; }
-  if (!gl) return fallback();
+  // One WebGL lens bound to one element.
+  function createLens(el, shade) {
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute("aria-hidden", "true");
+    var gl;
+    try {
+      gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, preserveDrawingBuffer: false });
+    } catch (e) { gl = null; }
+    if (!gl) return null;
 
-  function compile(type, src) {
-    var s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    function compile(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    }
+    var vs = compile(gl.VERTEX_SHADER, VERT);
+    var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return null;
+    var program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
+    gl.useProgram(program);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var aPos = gl.getAttribLocation(program, "a_pos");
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    var u = {};
+    ["u_tex", "u_hasTex", "u_size", "u_offset", "u_draw", "u_dpr", "u_shade"].forEach(function (name) {
+      u[name] = gl.getUniformLocation(program, name);
+    });
+    gl.uniform1i(u.u_tex, 0);
+    gl.uniform1f(u.u_shade, shade);
+
+    var hasTexture = false;
+    var textureSource = null;
+
+    function upload(source) {
+      try {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+        hasTexture = true;
+        textureSource = source;
+      } catch (e) {
+        // e.g. a not-yet-decodable frame; keep the previous texture.
+      }
+    }
+
+    function draw() {
+      if (gl.isContextLost()) return;
+      var c = el.getBoundingClientRect();
+      if (!c.width || !c.height) return; // e.g. the toggle is hidden
+      var dpr = Math.min(window.devicePixelRatio || 1, 3);
+      var w = Math.round(c.width * dpr);
+      var h = Math.round(c.height * dpr);
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      gl.viewport(0, 0, w, h);
+
+      // Same geometry as `object-fit: cover; object-position: 50% 100%`.
+      var source = textureSource || img;
+      var iw = source.videoWidth || source.naturalWidth || 16;
+      var ih = source.videoHeight || source.naturalHeight || 9;
+      var box = img.getBoundingClientRect();
+      var scale = Math.max(box.width / iw, box.height / ih);
+      var dw = iw * scale, dh = ih * scale;
+      var ox = box.left + (box.width - dw) * 0.5;
+      var oy = box.top + (box.height - dh);
+
+      gl.uniform1f(u.u_hasTex, hasTexture ? 1 : 0);
+      gl.uniform2f(u.u_size, c.width, c.height);
+      gl.uniform2f(u.u_offset, c.left - ox, c.top - oy);
+      gl.uniform2f(u.u_draw, dw, dh);
+      gl.uniform1f(u.u_dpr, dpr);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+
+    canvas.addEventListener("webglcontextlost", function (e) {
+      e.preventDefault();
+      looping = false;
+      fallback();
+    });
+
+    el.insertBefore(canvas, el.firstChild);
+    return { upload: upload, draw: draw };
   }
-  var vs = compile(gl.VERTEX_SHADER, VERT);
-  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) return fallback();
-  var program = gl.createProgram();
-  gl.attachShader(program, vs);
-  gl.attachShader(program, fs);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return fallback();
-  gl.useProgram(program);
 
-  var buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  var aPos = gl.getAttribLocation(program, "a_pos");
-  gl.enableVertexAttribArray(aPos);
-  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  var lenses = [];
+  for (var i = 0; i < TARGETS.length; i++) {
+    if (!elements[i]) continue;
+    var lens = createLens(elements[i], TARGETS[i].shade);
+    if (!lens) return fallback();
+    lenses.push(lens);
+  }
+  if (!lenses.length) return fallback();
 
-  var texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-  var u = {};
-  ["u_tex", "u_hasTex", "u_size", "u_offset", "u_draw", "u_dpr"].forEach(function (name) {
-    u[name] = gl.getUniformLocation(program, name);
-  });
-  gl.uniform1i(u.u_tex, 0);
-
-  var hasTexture = false;
-  var textureSource = null; // the element last uploaded
-
-  // Which element is currently visible behind the CTA.
+  // Which element is currently visible behind the controls.
   function currentSource() {
     if (video.classList.contains("is-visible") && video.readyState >= 2) return video;
     if (img.complete && img.naturalWidth) return img;
     return null;
   }
 
-  function upload(source) {
-    try {
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
-      hasTexture = true;
-      textureSource = source;
-    } catch (e) {
-      // e.g. a cross-origin or not-yet-decodable frame; keep the previous texture.
-    }
-  }
-
-  function draw() {
-    if (gl.isContextLost()) return;
-    var dpr = Math.min(window.devicePixelRatio || 1, 3);
-    var c = cta.getBoundingClientRect();
-    var w = Math.max(1, Math.round(c.width * dpr));
-    var h = Math.max(1, Math.round(c.height * dpr));
-    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    gl.viewport(0, 0, w, h);
-
-    // Same geometry as `object-fit: cover; object-position: 50% 100%`.
-    var source = textureSource || img;
-    var iw = source.videoWidth || source.naturalWidth || 16;
-    var ih = source.videoHeight || source.naturalHeight || 9;
-    var box = img.getBoundingClientRect();
-    var scale = Math.max(box.width / iw, box.height / ih);
-    var dw = iw * scale, dh = ih * scale;
-    var ox = box.left + (box.width - dw) * 0.5;
-    var oy = box.top + (box.height - dh);
-
-    gl.uniform1f(u.u_hasTex, hasTexture ? 1 : 0);
-    gl.uniform2f(u.u_size, c.width, c.height);
-    gl.uniform2f(u.u_offset, c.left - ox, c.top - oy);
-    gl.uniform2f(u.u_draw, dw, dh);
-    gl.uniform1f(u.u_dpr, dpr);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }
+  function drawAll() { lenses.forEach(function (l) { l.draw(); }); }
 
   // Re-upload the static source and redraw (poster loaded, video paused, resize…).
   function refresh() {
     var source = currentSource();
-    if (source) upload(source);
-    draw();
+    lenses.forEach(function (l) { if (source) l.upload(source); l.draw(); });
   }
 
   // While the video plays, redraw once per decoded frame (16 fps), not per display frame.
   var looping = false;
   function onFrame() {
     if (!looping) return;
-    if (video.readyState >= 2) upload(video);
-    draw();
+    var ready = video.readyState >= 2;
+    lenses.forEach(function (l) { if (ready) l.upload(video); l.draw(); });
     schedule();
   }
   function schedule() {
@@ -229,19 +265,19 @@
   video.addEventListener("emptied", stopLoop);
   img.addEventListener("load", refresh);
   window.addEventListener("resize", refresh);
-  window.addEventListener("scroll", draw, { passive: true });
-  if (window.ResizeObserver) new ResizeObserver(refresh).observe(cta);
+  window.addEventListener("scroll", drawAll, { passive: true });
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(refresh);
+    elements.forEach(function (el) { if (el) ro.observe(el); });
+  }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+  // The toggle is un-hidden by ribbon.js; draw it as soon as it has a size.
+  if (window.MutationObserver && elements[1]) {
+    new MutationObserver(refresh).observe(elements[1], { attributes: true, attributeFilter: ["hidden"] });
+  }
 
-  canvas.addEventListener("webglcontextlost", function (e) {
-    e.preventDefault();
-    looping = false;
-    fallback();
-  });
-
-  cta.insertBefore(canvas, cta.firstChild);
   refresh();
-  cta.classList.add("is-glass");
+  elements.forEach(function (el) { if (el) el.classList.add("is-glass"); });
   root.classList.remove("glass-pending");
   if (!video.paused && video.classList.contains("is-visible")) startLoop();
 })();
