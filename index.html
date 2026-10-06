@@ -2,151 +2,487 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>San Antonio &amp; the State of Innovation</title>
-  <meta name="description" content="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes.">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>San Antonio &amp; The State of Innovation 2026</title>
+  <meta name="description" content="Join San Antonio &amp; The State of Innovation on November 4 at Texas Public Radio for the State of Innovation Report and a look at San Antonio’s innovation economy.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <!-- PRODUCTION DOMAIN: canonical, og:url, og:image, twitter:image, the JSON-LD
+       URLs, robots.txt and sitemap.xml use the live Vercel production alias.
+       Replace https://innovation-report-pmc6.vercel.app everywhere if the event
+       moves to a custom domain. -->
+  <link rel="canonical" href="https://innovation-report-pmc6.vercel.app/">
+  <meta name="application-name" content="San Antonio &amp; The State of Innovation">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/assets/favicon-16.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <meta property="og:site_name" content="San Antonio &amp; The State of Innovation">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:url" content="https://innovation-report-pmc6.vercel.app/">
+  <meta property="og:title" content="San Antonio &amp; The State of Innovation 2026">
+  <meta property="og:description" content="Join San Antonio &amp; The State of Innovation on November 4 at Texas Public Radio for the State of Innovation Report and a look at San Antonio’s innovation economy.">
+  <meta property="og:image" content="https://innovation-report-pmc6.vercel.app/assets/social/state-of-innovation-2026.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="1080">
+  <meta property="og:image:alt" content="San Antonio &amp; The State of Innovation — report launch, breakfast and conversation. Wednesday, November 4, 2026, 8:00–10:00 AM at Texas Public Radio, 321 W Commerce St.">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="San Antonio &amp; The State of Innovation 2026">
+  <meta name="twitter:description" content="Join San Antonio &amp; The State of Innovation on November 4 at Texas Public Radio for the State of Innovation Report and a look at San Antonio’s innovation economy.">
+  <meta name="twitter:image" content="https://innovation-report-pmc6.vercel.app/assets/social/state-of-innovation-2026.jpg">
+  <meta name="twitter:image:alt" content="San Antonio &amp; The State of Innovation — report launch, breakfast and conversation. Wednesday, November 4, 2026, 8:00–10:00 AM at Texas Public Radio, 321 W Commerce St.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "@id": "https://innovation-report-pmc6.vercel.app/#event",
+    "name": "San Antonio & The State of Innovation",
+    "description": "Join us for San Antonio & The State of Innovation on Wednesday, November 4, at Texas Public Radio for a delicious breakfast, the presentation of the State of Innovation Report, and a conversation about where San Antonio’s innovation economy stands, where it’s going, and what it will take to compete on the national stage. Presented by Geekdom, Port San Antonio, Tech Bloc, and VelocityTX, with greater:SATX as a data partner.",
+    "url": "https://innovation-report-pmc6.vercel.app/",
+    "startDate": "2026-11-04T08:00:00-06:00",
+    "endDate": "2026-11-04T10:00:00-06:00",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "isAccessibleForFree": true,
+    "inLanguage": "en-US",
+    "image": [
+      "https://innovation-report-pmc6.vercel.app/assets/social/state-of-innovation-2026.jpg"
+    ],
+    "location": {
+      "@type": "Place",
+      "name": "Texas Public Radio",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "321 W Commerce St",
+        "addressLocality": "San Antonio",
+        "addressRegion": "TX",
+        "postalCode": "78205",
+        "addressCountry": "US"
+      }
+    },
+    "organizer": [
+      { "@type": "Organization", "name": "Geekdom", "url": "https://www.geekdom.com" },
+      { "@type": "Organization", "name": "Port San Antonio", "url": "https://www.portsanantonio.us" },
+      { "@type": "Organization", "name": "Tech Bloc", "url": "https://satechbloc.com/" },
+      { "@type": "Organization", "name": "VelocityTX", "url": "https://velocitytx.org" }
+    ],
+    "contributor": { "@type": "Organization", "name": "greater:SATX", "description": "Data partner" },
+    "workFeatured": {
+      "@type": "Report",
+      "name": "State of Innovation Report",
+      "about": "San Antonio’s innovation economy and its position in the national innovation landscape",
+      "spatialCoverage": { "@type": "City", "name": "San Antonio, Texas" }
+    },
+    "offers": {
+      "@type": "Offer",
+      "name": "Free RSVP",
+      "price": 0,
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "url": "https://www.simpletix.com/e/san-antonio-the-state-of-innovation-tickets-295238"
+    }
+  }
+  </script>
+  <link rel="preload" href="assets/fonts/ABCDiatype-Light.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/ABCDiatype-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <script>
+    // The CTA starts in its pre-WebGL glass state when WebGL is likely to work.
+    // assets/glass.js upgrades it; if that never happens the plain pill is restored.
+    (function () {
+      var root = document.documentElement;
+      try {
+        if (window.WebGLRenderingContext && !matchMedia("(prefers-reduced-transparency: reduce)").matches) {
+          root.classList.add("glass-pending");
+          setTimeout(function () { root.classList.remove("glass-pending"); }, 4000);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     @font-face {
-      font-family: "Neue Haas Grotesk Text";
-      src: url("assets/NeueHaasGroteskText-65Medium-Trial.otf") format("opentype");
+      font-family: "ABC Diatype";
+      src: url("assets/fonts/ABCDiatype-Light.woff2") format("woff2");
+      font-weight: 300;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "ABC Diatype";
+      src: url("assets/fonts/ABCDiatype-Medium.woff2") format("woff2");
       font-weight: 500;
       font-display: swap;
     }
-    :root { --bg: #000; --fg: #fff; }
+
+    /*
+      Figma trims text boxes to cap height. Diatype's cap height (0.70em) sits
+      centred in the line box, so trimming a line of line-height L means pulling
+      (L - 0.70) / 2 em off the top and bottom.
+    */
+    :root {
+      --white-50: rgb(255 255 255 / 0.5);
+      --white-88: rgb(255 255 255 / 0.88);
+      --trim-99: -0.145em;   /* line-height 99% */
+      --trim-97: -0.135em;   /* line-height 97% */
+      --trim-137: -0.335em;  /* line-height 137% */
+      --glass-tint: rgb(1 122 219 / 0.3);
+    }
     * { box-sizing: border-box; }
-    html, body { margin: 0; background: var(--bg); color: var(--fg); }
+    html { background: #000; }
     body {
-      font-family: "Neue Haas Grotesk Text", "Helvetica Neue", Arial, sans-serif;
-      font-weight: 500;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: "ABC Diatype", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 0.99;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
 
-    /* 1. Anchored consortium logos */
+    /* ---------- Page frame (desktop composition: MacBook Pro 16" 1728×1117) ---------- */
+    .page {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    /*
+      Ribbon artwork. The static poster and the video share one box and one
+      object-fit/object-position, so swapping between them never moves the art.
+      Desktop: full width, 16:9, anchored to the bottom (Figma 0,145 1728×972).
+    */
+    .ribbon {
+      position: absolute;
+      z-index: -1;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      aspect-ratio: 16 / 9;
+      pointer-events: none;
+    }
+    .ribbon img,
+    .ribbon video {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 100%;
+    }
+    .ribbon video { opacity: 0; transition: opacity 0.6s ease; }
+    .ribbon video.is-visible { opacity: 1; }
+
+    /* Presented by */
+    .partners {
+      margin-top: 64px;
+      width: 370px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .partners p { margin: var(--trim-99) 0; color: var(--white-50); }
     .logos {
-      --logo-height: clamp(24px, 4vw, 56px);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--bg);
+      list-style: none;
+      margin: 0;
+      padding: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: clamp(10px, 3vw, 24px);
-      padding: 24px clamp(16px, 5vw, 64px);
+      gap: 23.45px;
+      height: 41.27px;
     }
-    .logos a {
-      display: block;
-      padding: 8px 10px;
-      margin: -8px -10px;
-      transition: background .15s;
-    }
-    .logos a img { transition: filter .15s; }
-    .logos a:hover, .logos a:focus-visible { background: var(--fg); }
-    .logos a:hover img, .logos a:focus-visible img { filter: invert(1); }
-    .logos img { height: var(--logo-height); width: auto; display: block; }
-    /* Balance the visual weight of wide wordmarks and taller logo shapes. */
-    .logos .logo-port { height: calc(var(--logo-height) * 1.12); }
-    .logos .logo-techbloc { height: calc(var(--logo-height) * 1.35); }
-    .logos .logo-velocitytx { height: calc(var(--logo-height) * 1.6); }
+    .logos a { display: block; }
+    .logos img { display: block; }
 
-    /* Stage: black page with the official color art anchored bottom; copy stays in the black area */
-    .stage {
-      flex: 1;
-      display: flex;
-      /* Keep the art anchored to the bottom of the page. */
-      background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat;
-      /* reserve room under the copy for the blue hump (~1/3 of the art's height) */
-      padding-bottom: calc(max(100vw * 1009 / 1559, 100vh) * 0.305);
-    }
     main {
+      --num: clamp(64px, min(7.407vw, 14svh), 128px);  /* countdown numeral size */
+      flex: 1 0 auto;
+      width: 100%;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      padding: 6vh clamp(16px, 5vw, 64px) 0;
-      width: 80%;
-      max-width: 1440px;
+      align-items: center;
     }
-    @media (min-width: 801px) {
-      /* Use one continuous background behind the logos and content. */
-      body { background: #000 url("assets/innovation-art.webp") center bottom / cover no-repeat; }
-      .logos, .stage { background: transparent; }
+    /* Vertical rhythm. Above/below the countdown the free space splits 156:130 as in
+       Figma; the bottom gap follows the ribbon (334px of 1728 = 19.35vw) so the CTA
+       keeps its place just above the ribbon, but gives way on short screens. */
+    .space-top { flex: 156 1 0; min-height: 24px; }
+    .space-mid { flex: 130 1 0; min-height: 32px; }
+    /* 436.3px = everything else in the column at its minimum spacing; the numerals'
+       trimmed height is 0.9125 × --num. */
+    .space-end {
+      flex: 0 0 auto;
+      height: max(64px, min(19.35vw, 100svh - 436.3px - 0.9125 * var(--num)));
     }
-    @media (max-width: 800px) {
-      body { min-height: 100svh; }
-      /* Reserve only the colored wave's height so the stage fits the phone screen. */
-      .stage { background-size: 100% auto; padding-bottom: calc(100vw * 1009 / 1559 * 0.305); }
-      main { width: 100%; max-width: none; padding-top: 10svh; padding-bottom: 4svh; }
-    }
-    .typewriter {
-      margin: 0;
-      font-weight: 500;
-      font-size: clamp(20.8px, 2.64vw, 44.8px);
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-      min-height: 3.45em; /* reserve space so the button doesn't jump while typing */
-    }
-    @media (max-width: 800px) {
-      .typewriter { font-size: clamp(28px, 5.5vw, 40px); line-height: 1.2; }
-    }
-    .cursor {
-      display: inline-block;
-      width: 0.08em;
-      height: 0.95em;
-      margin-left: 0.08em;
-      background: var(--fg);
-      vertical-align: -0.1em;
-      animation: blink 1s steps(1) infinite;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-    /* button sits centered between the headline and the top of the blue hump */
-    .cta-wrap { flex: 1; display: flex; align-items: center; min-height: 140px; }
-    .cta {
-      display: inline-block;
-      padding: 16px 32px;
-      border: 2px solid var(--fg);
-      color: var(--fg);
-      background: transparent;
-      font: inherit;
-      font-size: 20px;
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      transition: background .15s, color .15s;
-    }
-    .cta:hover, .cta:focus-visible { background: var(--fg); color: #000; }
 
+    /* Countdown */
+    .countdown-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+    }
+    .countdown {
+      display: flex;
+      gap: 0.25em;
+      margin: 0;
+      font-size: var(--num);
+      font-weight: 500;
+    }
+    .unit {
+      width: 1.203em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.125em;
+    }
+    .unit-label {
+      margin: var(--trim-99) 0;
+      font-size: 0.125em;
+      line-height: 0.99;
+      text-transform: uppercase;
+      color: var(--white-50);
+    }
+    .unit-value {
+      margin: var(--trim-97) 0;
+      line-height: 0.97;
+      color: var(--white-88);
+      font-variant-numeric: tabular-nums lining-nums;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .when {
+      margin: var(--trim-137) 0;
+      font-weight: 500;
+      line-height: 1.37;
+      text-align: center;
+      text-transform: uppercase;
+      color: var(--white-50);
+    }
+
+    /* Intro + CTA */
+    .intro-group {
+      width: 370px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+    .intro {
+      margin: var(--trim-99) 0;
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 0.99;
+      text-align: center;
+    }
+    .intro p,
+    .intro h1 { margin: 0; font: inherit; }
+    .intro p + p,
+    .intro p + h1 { margin-top: 0.99em; }
+
+    .cta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 48px;
+      border-radius: 999px;
+      font-weight: 500;
+      text-decoration: none;
+      /* Fallback when Liquid Glass can't run: a translucent black pill. */
+      background: rgb(0 0 0 / 0.55);
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+    }
+    .glass-pending .cta { background: var(--glass-tint); box-shadow: none; }
+    .cta.is-glass { background: transparent; box-shadow: none; }
+    .cta canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .cta span { position: relative; margin: var(--trim-99) 0; line-height: 0.99; }
+
+    /* Background animation control */
+    .motion-toggle {
+      position: absolute;
+      z-index: 2;
+      right: 24px;
+      bottom: 24px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .motion-toggle[hidden] { display: none; }
+    .motion-toggle svg { width: 24px; height: 24px; display: block; }
+    .motion-toggle .icon-play { display: none; }
+    .motion-toggle[data-state="paused"] .icon-play { display: block; }
+    .motion-toggle[data-state="paused"] .icon-pause { display: none; }
+
+    /* ---------- Mobile composition (iPhone 16/17 Pro 402×874) ----------
+       Used for portrait screens and anything narrower than a tablet. */
+    @media (max-aspect-ratio: 1/1), (max-width: 767px) {
+      main {
+        --num: calc(min(100vw - 32px, 560px) * 0.173);
+        width: min(100%, 560px);
+        align-items: stretch;
+      }
+
+      /* Full-height ribbon cropped to Figma's mobile slice (portrait derivative). */
+      .ribbon { top: 0; aspect-ratio: auto; }
+
+      .space-top { flex: 1 1 0; min-height: 32px; }
+      .space-mid { flex: 0 0 clamp(48px, 11svh, 96px); min-height: 0; }
+      .space-end { height: 64px; }
+
+      .countdown-group { align-items: stretch; gap: 40px; }
+      .countdown {
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .unit { gap: 0.125em; }
+
+      .intro-group { width: 100%; align-items: stretch; }
+      .intro { width: 279px; max-width: 100%; text-align: left; }
+
+      .motion-toggle { top: 16px; right: 16px; bottom: auto; width: 32px; height: 32px; }
+      .motion-toggle svg { width: 20px; height: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ribbon video { transition: none; }
+    }
   </style>
 </head>
 <body>
-  <header class="logos" aria-label="Consortium members">
-    <a href="https://www.geekdom.com" target="_blank" rel="noopener"><img src="assets/logo-geekdom.png" alt="Geekdom"></a>
-    <a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img class="logo-port" src="assets/logo-port-san-antonio.png" alt="Port San Antonio"></a>
-    <a href="https://satechbloc.com/" target="_blank" rel="noopener"><img class="logo-techbloc" src="assets/logo-techbloc.png" alt="Tech Bloc"></a>
-    <a href="https://velocitytx.org" target="_blank" rel="noopener"><img class="logo-velocitytx" src="assets/logo-velocitytx.png" alt="VelocityTX"></a>
-  </header>
+  <div class="page">
+    <div class="ribbon" aria-hidden="true">
+      <picture>
+        <source media="(max-aspect-ratio: 1/1), (max-width: 767px)" type="image/avif"
+                srcset="assets/media/ribbon-mobile-540.avif 540w, assets/media/ribbon-mobile-810.avif 810w"
+                sizes="(max-aspect-ratio: 9/16) 56.25vh, 100vw">
+        <source media="(max-aspect-ratio: 1/1), (max-width: 767px)" type="image/webp"
+                srcset="assets/media/ribbon-mobile-540.webp 540w, assets/media/ribbon-mobile-810.webp 810w"
+                sizes="(max-aspect-ratio: 9/16) 56.25vh, 100vw">
+        <source type="image/avif"
+                srcset="assets/media/ribbon-desktop-1280.avif 1280w, assets/media/ribbon-desktop-1920.avif 1920w, assets/media/ribbon-desktop-2560.avif 2560w"
+                sizes="100vw">
+        <source type="image/webp"
+                srcset="assets/media/ribbon-desktop-1280.webp 1280w, assets/media/ribbon-desktop-1920.webp 1920w, assets/media/ribbon-desktop-2560.webp 2560w"
+                sizes="100vw">
+        <img src="assets/media/ribbon-desktop-1920.webp" alt="" width="2560" height="1440" fetchpriority="high">
+      </picture>
+      <video muted playsinline loop preload="none" tabindex="-1"
+             disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
+    </div>
 
-  <div class="stage">
-  <main>
-    <h1 class="typewriter" id="headline" aria-label="San Antonio has never had a shared baseline for its innovation economy. On November 4, that changes."><span id="intro">San Antonio has never had a shared baseline for its innovation economy.</span><br><br><span id="typed"></span><span class="cursor" aria-hidden="true"></span></h1>
-    <div class="cta-wrap"><a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener">JOIN THE CONVERSATION</a></div>
-  </main>
+    <header class="partners">
+      <p>Presented by</p>
+      <ul class="logos">
+        <li><a href="https://www.geekdom.com" target="_blank" rel="noopener"><img src="assets/logos/geekdom.svg" alt="Geekdom" width="76" height="29"></a></li>
+        <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img src="assets/logos/port-san-antonio.svg" alt="Port San Antonio" width="82" height="36"></a></li>
+        <li><a href="https://satechbloc.com/" target="_blank" rel="noopener"><img src="assets/logos/techbloc.svg" alt="Tech Bloc" width="56" height="36"></a></li>
+        <li><a href="https://velocitytx.org" target="_blank" rel="noopener"><img src="assets/logos/velocitytx.svg" alt="VelocityTX" width="61" height="42"></a></li>
+      </ul>
+    </header>
+
+    <main>
+      <div class="space-top" aria-hidden="true"></div>
+
+      <section class="countdown-group" aria-label="Countdown to the event">
+        <div class="countdown" aria-hidden="true">
+          <div class="unit"><span class="unit-label">Days</span><span class="unit-value" data-unit>--</span></div>
+          <div class="unit"><span class="unit-label">Hrs</span><span class="unit-value" data-unit>--</span></div>
+          <div class="unit"><span class="unit-label">Mins</span><span class="unit-value" data-unit>--</span></div>
+          <div class="unit"><span class="unit-label">Sec</span><span class="unit-value" data-unit>--</span></div>
+        </div>
+        <p class="visually-hidden" id="countdown-text"></p>
+        <p class="when"><time datetime="2026-11-04T08:00-06:00">Nov 04, 2026 · 8–10 AM</time><br>Texas Public Radio · San Antonio</p>
+      </section>
+      <script>
+        // Counts down to Nov 4, 2026, 8:00 AM America/Chicago (CST, UTC−6): 2026-11-04T08:00:00-06:00.
+        // Runs inline so the first values are in place before first paint.
+        (function () {
+          var target = Date.UTC(2026, 10, 4, 14, 0);
+          var cells = document.querySelectorAll("[data-unit]");
+          var spoken = document.getElementById("countdown-text");
+          var lastMinute = -1;
+          function pad(n) { return n < 10 ? "0" + n : String(n); }
+          function tick() {
+            var ms = Math.max(0, target - Date.now());
+            var s = Math.floor(ms / 1000);
+            var values = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+            for (var i = 0; i < cells.length; i++) {
+              var text = pad(values[i]);
+              if (cells[i].textContent !== text) cells[i].textContent = text;
+            }
+            // Screen readers get a per-minute summary rather than every second.
+            var minute = Math.floor(s / 60);
+            if (minute !== lastMinute) {
+              lastMinute = minute;
+              spoken.textContent = ms > 0
+                ? values[0] + " days, " + values[1] + " hours and " + values[2] + " minutes until the event."
+                : "The event has started.";
+            }
+            if (ms > 0) setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+          }
+          tick();
+        })();
+      </script>
+
+      <div class="space-mid" aria-hidden="true"></div>
+
+      <div class="intro-group">
+        <div class="intro">
+          <p>San Antonio has never had a shared baseline for its innovation economy.</p>
+          <p>On November 4, that changes.</p>
+          <h1>San Antonio &amp; The State of Innovation.</h1>
+        </div>
+        <a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener"><span>RSVP — FREE</span></a>
+      </div>
+
+      <div class="space-end" aria-hidden="true"></div>
+    </main>
+
+    <button class="motion-toggle" type="button" aria-label="Pause background animation" data-state="playing" hidden>
+      <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" stroke="currentColor" stroke-width="1.25" d="M6 18.4V5.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v12.8a.6.6 0 0 1-.6.6H6.6a.6.6 0 0 1-.6-.6Zm8 0V5.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v12.8a.6.6 0 0 1-.6.6h-2.8a.6.6 0 0 1-.6-.6Z"/>
+      </svg>
+      <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/>
+      </svg>
+    </button>
   </div>
 
-  <script>
-    // Types once per page load; cursor keeps blinking afterward (CSS).
-    (function () {
-      var text = "On November 4, that changes.";
-      var el = document.getElementById("typed");
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = text; return; }
-      var i = 0;
-      (function tick() {
-        el.textContent = text.slice(0, ++i);
-        if (i >= text.length) return;
-        setTimeout(tick, 45 + Math.random() * 45);
-      })();
-    })();
-  </script>
+  <script src="assets/ribbon.js"></script>
+  <script src="assets/glass.js" defer></script>
 </body>
 </html>
