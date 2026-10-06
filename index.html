@@ -336,13 +336,26 @@
       padding: 0;
       border: 0;
       border-radius: 50%;
-      background: #fff;
-      color: #000;
+      color: #fff;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      /* Same glass language as the CTA (assets/glass.js). Fallback: translucent black. */
+      background: rgb(0 0 0 / 0.55);
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+    }
+    /* Pre-WebGL state: the toggle's slightly deeper lens (see glass.js) over the tint. */
+    .glass-pending .motion-toggle { background: rgb(1 98 175 / 0.45); box-shadow: none; }
+    .motion-toggle.is-glass { background: transparent; box-shadow: none; }
+    .motion-toggle canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      pointer-events: none;
     }
     .motion-toggle[hidden] { display: none; }
-    .motion-toggle svg { width: 24px; height: 24px; display: block; }
+    .motion-toggle svg { position: relative; width: 24px; height: 24px; display: block; }
     .motion-toggle .icon-play { display: none; }
     .motion-toggle[data-state="paused"] .icon-play { display: block; }
     .motion-toggle[data-state="paused"] .icon-pause { display: none; }
