@@ -183,7 +183,7 @@ button, input { font: inherit; color: inherit; }
   height: 100%;
   border: 0;
   background: none;
-  font-weight: 500;
+  font-weight: 400;
   color: #fff;
   outline: none;
 }
@@ -224,7 +224,7 @@ button, input { font: inherit; color: inherit; }
 .download.is-done .field { display: none; }
 
 /* ---------- Presented by ---------- */
-.consortium .eyebrow { margin-bottom: 12px; }
+.consortium .eyebrow { margin-bottom: 12px; color: rgb(255 255 255 / 0.75); }
 .consortium .logos-strip { margin-top: 44px; }
 
 /* ---------- Logo strips (consortium + sponsors) ----------
@@ -263,7 +263,7 @@ button, input { font: inherit; color: inherit; }
 .quote figcaption { margin-top: 24px; }
 
 /* ---------- Inside the Report ---------- */
-.inside .intro { margin-top: 24px; }
+.inside .intro { margin-top: 24px; color: rgb(255 255 255 / 0.75); }
 .stats {
   list-style: none;
   margin: 24px 0 0;
@@ -281,6 +281,8 @@ button, input { font: inherit; color: inherit; }
 }
 .stat-value { order: 1; margin: 0; font-size: var(--stat); font-weight: 500; line-height: 0.917; letter-spacing: -0.02em; }
 .stat-value.trim { margin-block: calc((0.7em - 1lh) / 2); }
+/* Equal-width figures + a locked width: the reveal never moves the layout. */
+.stat-count { display: inline-block; white-space: nowrap; font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 .stat-meta {
   order: 2;
   margin: 16px 0 0;
@@ -300,7 +302,7 @@ button, input { font: inherit; color: inherit; }
 /* Screen readers get the title first; visually it sits at the foot of the card (Figma). */
 .stat h3 { order: 3; margin: auto 0 0; padding-top: 60px; font-size: var(--card-title); font-weight: 700; line-height: 1.37; letter-spacing: -0.01em; }
 .stat-body { order: 4; }
-.stat-desc { margin: 4px 0 0; max-width: 34em; font-size: var(--card-text); font-weight: 400; line-height: 1.37; letter-spacing: -0.01em; }
+.stat-desc { margin: 4px 0 0; color: rgb(255 255 255 / 0.75); max-width: 34em; font-size: var(--card-text); font-weight: 400; line-height: 1.37; letter-spacing: -0.01em; }
 
 /* ---------- greater:SATX ---------- */
 .greater .badge {
@@ -315,7 +317,7 @@ button, input { font: inherit; color: inherit; }
 }
 .greater .badge img { width: 52.7%; height: auto; }
 .greater h2 { margin-top: 24px; }
-.greater .prose { margin-top: 24px; }
+.greater .prose { margin-top: 24px; color: rgb(255 255 255 / 0.75); }
 
 /* ---------- Sponsors ---------- */
 .sponsors .strip { margin-top: 44px; }
@@ -328,6 +330,11 @@ button, input { font: inherit; color: inherit; }
   padding: 32px var(--gutter) clamp(32px, 22.3px + 2.41vw, 64px);
 }
 .closing .wrap { container-type: normal; }
+/* The closing download sits in the middle of the section. */
+.closing { align-items: center; padding-block: clamp(32px, 22.3px + 2.41vw, 64px); }
+.closing .download { margin-inline: auto; }
+.closing .download-title { text-align: center; }
+.closing .download-msg { margin-inline: auto; }
 
 /* ---------- Two-column layouts once there's room for them ---------- */
 @container (min-width: 880px) {

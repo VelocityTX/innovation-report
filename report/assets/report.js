@@ -160,6 +160,69 @@
   render();
   syncAll();
 
+  /* --------------------------- Stat reveal --------------------------- */
+  // The three headline numbers resolve like a fast data readout when the cards come
+  // into view: a decelerating count from a same-length start value with fading jitter
+  // in the low digits, landing exactly on the real figure. Screen readers only ever
+  // get the final value (the animated text is aria-hidden). Reduced motion: no effect.
+  var counters = [].slice.call(document.querySelectorAll(".stat-count[data-to]"));
+  var DURATION = 820;
+
+  function formatNumber(el, n) {
+    var d = +el.dataset.decimals || 0;
+    var s = n.toFixed(d);
+    if (el.hasAttribute("data-group")) {
+      var parts = s.split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      s = parts.join(".");
+    }
+    return (el.dataset.prefix || "") + s + (el.dataset.suffix || "");
+  }
+
+  function reveal(el, delay) {
+    var to = parseFloat(el.dataset.to), from = parseFloat(el.dataset.from), d = +el.dataset.decimals || 0;
+    var step = Math.pow(10, -d), span = to - from;
+    var finalText = formatNumber(el, to);
+    setTimeout(function () {
+      var start = performance.now();
+      (function tick() {
+        var t = Math.min(1, (performance.now() - start) / DURATION);
+        if (t >= 1) { el.textContent = finalText; return; }
+        var eased = 1 - Math.pow(1 - t, 3);                       // decelerate toward the end
+        var jitter = (Math.random() - 0.5) * span * 0.35 * Math.pow(1 - t, 2);
+        var v = from + span * eased + jitter;
+        v = Math.round(Math.min(to, Math.max(from, v)) / step) * step;
+        el.textContent = formatNumber(el, v);
+        // Updates come very fast at first, then spread out as the value settles.
+        setTimeout(tick, 16 + 70 * t * t);
+      })();
+    }, delay);
+  }
+
+  if (counters.length && !reduceMotion.matches && "IntersectionObserver" in window) {
+    // Lock each number's width to its final value, then show the start value.
+    counters.forEach(function (el) {
+      el.style.minWidth = el.getBoundingClientRect().width + "px";
+      el.textContent = formatNumber(el, parseFloat(el.dataset.from));
+    });
+    var statsIO = new IntersectionObserver(function (entries) {
+      if (!entries.some(function (e) { return e.isIntersecting; })) return;
+      statsIO.disconnect();
+      counters.forEach(function (el, i) { reveal(el, i * 90); });
+    }, { threshold: 0.35 });
+    statsIO.observe(document.querySelector(".stats"));
+    // Re-lock widths after web fonts settle (the first measurement may use a fallback).
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+      counters.forEach(function (el) {
+        var cur = el.textContent;
+        el.style.minWidth = "";
+        el.textContent = formatNumber(el, parseFloat(el.dataset.to));
+        el.style.minWidth = el.getBoundingClientRect().width + "px";
+        el.textContent = cur;
+      });
+    });
+  }
+
   /* ------------------------- Download (soft gate) ------------------------ */
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
