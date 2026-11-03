@@ -9,7 +9,7 @@
   "use strict";
 
   // Set to the report PDF once it exists; until then the success state just confirms.
-  var REPORT_PDF = "";
+  var REPORT_PDF = "/report/assets/pdf/2026-San-Antonio-State-Of-Innovation-Report.pdf";
 
   var root = document.documentElement;
   var compact = matchMedia("(max-aspect-ratio: 5/8)");
@@ -264,53 +264,121 @@
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   // Hook for Mailchimp later: must never throw or delay the download.
-  function collect(email) {
+  function collect(data) {
     try { /* intentionally empty until the Mailchimp form address is provided */ } catch (e) {}
   }
 
+  function startDownload() {
+    if (!REPORT_PDF) return;
+    var a = document.createElement("a");
+    a.href = REPORT_PDF; a.download = ""; document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  /* Step 2: the details modal (Liquid Glass). Opens once a valid email is entered. */
+  var dialog = document.getElementById("details");
+  var detailsForm = document.getElementById("details-form");
+  var done = document.getElementById("details-done");
+  var detailsError = document.getElementById("details-error");
+  var pendingEmail = "";
+  var returnFocus = null;
+
+  function openDetails(email, from) {
+    pendingEmail = email;
+    returnFocus = from;
+    detailsForm.hidden = false;
+    done.hidden = true;
+    detailsError.textContent = "";
+    [].slice.call(detailsForm.querySelectorAll("[aria-invalid]")).forEach(function (el) { el.removeAttribute("aria-invalid"); });
+    root.classList.add("modal-open");
+    if (dialog.showModal) dialog.showModal(); else dialog.setAttribute("open", "");
+    var first = detailsForm.querySelector("input[name=workplace]");
+    if (first) first.focus();
+  }
+  function closeDetails() {
+    if (dialog.open && dialog.close) dialog.close(); else dialog.removeAttribute("open");
+  }
+  dialog.addEventListener("close", function () {
+    root.classList.remove("modal-open");
+    if (returnFocus) returnFocus.focus();
+  });
+  [].slice.call(dialog.querySelectorAll("[data-close]")).forEach(function (b) { b.addEventListener("click", closeDetails); });
+  // Click on the dimmed backdrop closes too.
+  dialog.addEventListener("click", function (e) { if (e.target === dialog) closeDetails(); });
+
+  // Clear the red outline as soon as a field becomes valid.
+  detailsForm.addEventListener("input", function (e) {
+    var t = e.target;
+    if (t.name === "workplace") t.closest("fieldset").removeAttribute("aria-invalid");
+    else if (t.value && t.value.trim()) t.removeAttribute("aria-invalid");
+  });
+  detailsForm.addEventListener("change", function (e) {
+    if (e.target.name === "workplace") e.target.closest("fieldset").removeAttribute("aria-invalid");
+    else if (e.target.value) e.target.removeAttribute("aria-invalid");
+  });
+
+  detailsForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = detailsForm.elements;
+    var missing = [];
+    var workplace = detailsForm.querySelector("input[name=workplace]:checked");
+    var fieldset = detailsForm.querySelector("fieldset[data-required]");
+    if (!workplace) { fieldset.setAttribute("aria-invalid", "true"); missing.push({ el: f.workplace[0], label: "where you work" }); }
+    [["company", "company"], ["age", "age"], ["firstName", "first name"], ["lastName", "last name"]].forEach(function (k) {
+      var el = f[k[0]];
+      if (!el.value || !el.value.trim()) { el.setAttribute("aria-invalid", "true"); missing.push({ el: el, label: k[1] }); }
+    });
+    if (missing.length) {
+      var labels = missing.map(function (m) { return m.label; });
+      var list = labels.length > 1 ? labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1] : labels[0];
+      detailsError.textContent = "Please fill in " + list + ".";
+      missing[0].el.focus();
+      return;
+    }
+    var data = {
+      email: pendingEmail,
+      workplace: workplace.value,
+      company: f.company.value.trim(),
+      age: f.age.value,
+      firstName: f.firstName.value.trim(),
+      lastName: f.lastName.value.trim()
+    };
+    collect(data);
+    startDownload();   // never waits on collection
+    document.getElementById("details-done-text").textContent = REPORT_PDF
+      ? "Thanks, " + data.firstName + " — your download has started."
+      : "Thanks, " + data.firstName + " — the report download will start here once the PDF is connected.";
+    detailsForm.hidden = true;
+    done.hidden = false;
+    done.focus();
+  });
+
+  /* Step 1: business email (hero, footer and the floating field). */
   [].slice.call(document.querySelectorAll("[data-download]")).forEach(function (form) {
     var input = form.querySelector("input[type=email]");
-    var submit = form.querySelector("button[type=submit]");
     var msg = form.querySelector(".download-msg");
 
-    function say(text, isError, html) {
-      msg.classList.toggle("is-error", !!isError);
-      if (html) msg.innerHTML = html; else msg.textContent = text;
+    // Errors show as a red outline on the field; the text is announced for screen readers.
+    function sayError(text) {
+      msg.classList.add("is-error");
+      msg.textContent = text;
+    }
+    function clearError() {
+      input.removeAttribute("aria-invalid");
+      msg.classList.remove("is-error");
+      msg.textContent = "";
     }
 
     input.addEventListener("input", function () {
-      if (input.getAttribute("aria-invalid") === "true" && EMAIL.test(input.value.trim())) {
-        input.removeAttribute("aria-invalid");
-        say("");
-      }
+      if (input.getAttribute("aria-invalid") === "true" && EMAIL.test(input.value.trim())) clearError();
     });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var email = input.value.trim();
-      if (!email) { input.setAttribute("aria-invalid", "true"); say("Enter your business email to download the report.", true); input.focus(); return; }
-      if (!EMAIL.test(email)) { input.setAttribute("aria-invalid", "true"); say("Enter a valid email address, like name@company.com.", true); input.focus(); return; }
-
-      input.removeAttribute("aria-invalid");
-      submit.setAttribute("aria-busy", "true");
-      submit.disabled = true;
-      collect(email);
-
-      // The download never waits on collection.
-      setTimeout(function () {
-        submit.removeAttribute("aria-busy");
-        submit.disabled = false;
-        form.classList.add("is-done");
-        if (REPORT_PDF) {
-          var a = document.createElement("a");
-          a.href = REPORT_PDF; a.download = ""; document.body.appendChild(a); a.click(); a.remove();
-          say("", false, 'Thanks — your download has started. <a href="' + REPORT_PDF + '" download>Download the report (PDF)</a>');
-        } else {
-          say("Thanks — the report download will start here once the PDF is connected.");
-        }
-        msg.setAttribute("tabindex", "-1");
-        msg.focus();
-      }, 350);
+      if (!email) { input.setAttribute("aria-invalid", "true"); sayError("Enter your business email to download the report."); input.focus(); return; }
+      if (!EMAIL.test(email)) { input.setAttribute("aria-invalid", "true"); sayError("Enter a valid email address, like name@company.com."); input.focus(); return; }
+      clearError();
+      openDetails(email, input);
     });
   });
 })();

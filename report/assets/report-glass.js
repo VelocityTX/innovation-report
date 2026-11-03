@@ -24,10 +24,10 @@
     "precision highp float;",
     "varying vec2 v_uv;",
     "uniform sampler2D u_tex; uniform float u_hasTex;",
-    "uniform vec2 u_size; uniform vec2 u_offset; uniform vec2 u_draw; uniform float u_dpr; uniform float u_shade;",
+    "uniform vec2 u_size; uniform vec2 u_offset; uniform vec2 u_draw; uniform float u_dpr; uniform float u_shade; uniform float u_radius;",
     "const vec2 LIGHT_DIR = vec2(-0.70710678, -0.70710678);",
     "const vec3 TINT = vec3(1.0, 122.0, 219.0) / 255.0;",
-    "float pill(vec2 p, vec2 h){ float r=h.y; vec2 q=abs(p)-h+r; return length(max(q,0.))+min(max(q.x,q.y),0.)-r; }",
+    "float pill(vec2 p, vec2 h){ float r=min(u_radius,h.y); vec2 q=abs(p)-h+r; return length(max(q,0.))+min(max(q.x,q.y),0.)-r; }",
     "vec3 backdrop(vec2 px){ vec2 uv=(u_offset+px)/u_draw;",
     "  if(u_hasTex<.5||uv.x<0.||uv.y<0.||uv.x>1.||uv.y>1.) return vec3(0.); return texture2D(u_tex,uv).rgb; }",
     "void main(){",
@@ -35,8 +35,8 @@
     "  float alpha=clamp(.5-d*u_dpr,0.,1.); if(alpha<=0.){gl_FragColor=vec4(0.);return;}",
     "  vec2 e=vec2(.5,0.);",
     "  vec2 n=normalize(vec2(pill(p+e.xy,h)-pill(p-e.xy,h), pill(p+e.yx,h)-pill(p-e.yx,h))+1e-5);",
-    "  float t=clamp(-d/h.y,0.,1.); float bend=pow(1.-t,3.);",
-    "  vec2 shift=n*bend*h.y*.9; float spread=.04;",
+    "  float bevel=min(h.y,u_radius); float t=clamp(-d/bevel,0.,1.); float bend=pow(1.-t,3.);",
+    "  vec2 shift=n*bend*bevel*.9; float spread=.04;",
     "  vec3 col; col.r=backdrop(px+shift*(1.+spread)).r; col.g=backdrop(px+shift).g; col.b=backdrop(px+shift*(1.-spread)).b;",
     "  col=mix(col,TINT,.3)*(1.-u_shade);",
     "  float facing=dot(n,LIGHT_DIR); float rim=1.-smoothstep(0.,1.6,-d); float edge=1.-smoothstep(0.,7.,-d);",
@@ -46,11 +46,31 @@
     "}"
   ].join("\n");
 
+  var ribbonScopes = [].slice.call(document.querySelectorAll(".has-ribbon"));
+  // Lenses outside a ribbon section (the details modal) refract whichever ribbon is
+  // most on screen at the moment.
+  function mostVisibleScope() {
+    var best = ribbonScopes[0], area = -1;
+    ribbonScopes.forEach(function (sc) {
+      var r = sc.getBoundingClientRect();
+      var a = Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0));
+      if (a > area) { area = a; best = sc; }
+    });
+    return best;
+  }
+
   function createLens(el) {
-    var scope = el.closest(".has-ribbon");
+    var fixedScope = el.closest(".has-ribbon");
+    var dynamic = !fixedScope;
+    var scope = fixedScope || ribbonScopes[0];
     var img = scope && scope.querySelector(".ribbon img");
     var video = scope && scope.querySelector(".ribbon video");
     if (!img || !video) return null;
+    function rescope() {
+      if (!dynamic) return;
+      var sc = mostVisibleScope();
+      img = sc.querySelector(".ribbon img"); video = sc.querySelector(".ribbon video");
+    }
     var canvas = document.createElement("canvas");
     canvas.setAttribute("aria-hidden", "true");
     var gl;
@@ -69,9 +89,10 @@
     [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(function (k) { gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE); });
     [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(function (k) { gl.texParameteri(gl.TEXTURE_2D, k, gl.LINEAR); });
     var u = {};
-    ["u_tex", "u_hasTex", "u_size", "u_offset", "u_draw", "u_dpr", "u_shade"].forEach(function (k) { u[k] = gl.getUniformLocation(prog, k); });
+    ["u_tex", "u_hasTex", "u_size", "u_offset", "u_draw", "u_dpr", "u_shade", "u_radius"].forEach(function (k) { u[k] = gl.getUniformLocation(prog, k); });
     gl.uniform1i(u.u_tex, 0);
     gl.uniform1f(u.u_shade, parseFloat(el.getAttribute("data-glass")) || 0);
+    gl.uniform1f(u.u_radius, parseFloat(el.getAttribute("data-glass-radius")) || 1e4);
     var has = false, src = null, visible = true;
 
     function source() {
@@ -80,6 +101,7 @@
       return null;
     }
     function upload() {
+      rescope();
       var s = source(); if (!s) return;
       try { gl.bindTexture(gl.TEXTURE_2D, tex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, s); has = true; src = s; } catch (e) {}
     }
@@ -106,7 +128,7 @@
     }
     canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); fallback(); });
     el.insertBefore(canvas, el.firstChild);
-    return { el: el, video: video, img: img, upload: upload, draw: draw, setVisible: function (v) { visible = v; if (v) { upload(); draw(); } } };
+    return { el: el, dynamic: dynamic, video: video, img: img, upload: upload, draw: draw, setVisible: function (v) { visible = v; if (v) { upload(); draw(); } } };
   }
 
   var lenses = [];
@@ -121,9 +143,9 @@
 
   // Per video: redraw its lenses once per decoded frame while it plays.
   var videos = [];
-  lenses.forEach(function (l) { if (videos.indexOf(l.video) < 0) videos.push(l.video); });
+  lenses.forEach(function (l) { if (!l.dynamic && videos.indexOf(l.video) < 0) videos.push(l.video); });
   videos.forEach(function (v) {
-    var mine = lenses.filter(function (l) { return l.video === v; });
+    var mine = lenses.filter(function (l) { return !l.dynamic && l.video === v; });
     var looping = false;
     function frame() {
       if (!looping) return;
@@ -133,6 +155,18 @@
     v.addEventListener("playing", function () { if (!looping) { looping = true; frame(); } });
     ["pause", "emptied"].forEach(function (ev) { v.addEventListener(ev, function () { looping = false; mine.forEach(function (l) { l.upload(); l.draw(); }); }); });
     mine.forEach(function (l) { l.img.addEventListener("load", function () { l.upload(); l.draw(); }); });
+  });
+
+  // Dynamic lenses (the modal): ~16 fps refresh while they're on screen.
+  lenses.filter(function (l) { return l.dynamic; }).forEach(function (l) {
+    var timer = null;
+    function tick() {
+      if (!l.el.getClientRects().length) { timer = null; return; }
+      l.upload(); l.draw();
+      timer = setTimeout(tick, 62);
+    }
+    var host = l.el.closest("dialog") || l.el;
+    new MutationObserver(function () { if (!timer) tick(); }).observe(host, { attributes: true, attributeFilter: ["open", "hidden", "class"] });
   });
 
   if ("IntersectionObserver" in window) {
