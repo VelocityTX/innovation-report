@@ -285,7 +285,7 @@ button, input { font: inherit; color: inherit; }
 .sponsor-logos img { height: var(--h); }
 
 /* ---------- Quote ---------- */
-.quote { background: var(--ink-quote); }
+.quote { background: var(--black); }
 /* Mobile: 32px between a section headline and its body copy. */
 .quote figure { margin-top: 32px; }
 .quote blockquote { margin: 0; }
