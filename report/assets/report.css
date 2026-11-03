@@ -169,7 +169,7 @@ button, input { font: inherit; color: inherit; }
 .download-fields { display: flex; flex-direction: column; gap: 13px; }
 .name-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 13px; }
 .field {
-  height: 412px;
+  height: 48px;
   border-radius: 12px;
   display: flex;
   align-items: center;
