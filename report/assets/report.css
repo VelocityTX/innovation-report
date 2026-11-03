@@ -377,6 +377,9 @@ button, input { font: inherit; color: inherit; }
   padding: 32px var(--gutter) clamp(32px, 22.3px + 2.41vw, 64px);
 }
 .closing .wrap { container-type: normal; }
+/* The closing section (which owns the floating download field) sits above all page
+   content, so the floating field is always in front. */
+.closing { z-index: 2; }
 /* The closing download sits in the middle of the section. */
 .closing { align-items: center; padding-block: clamp(32px, 22.3px + 2.41vw, 64px); }
 /* With the full-width 16:9 art, the section is at least as tall as the video frame,
