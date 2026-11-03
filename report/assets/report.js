@@ -275,59 +275,35 @@
   }
 
   /* ------------------------- Floating download ------------------------- */
-  // The closing email field floats 16px above the bottom of the screen across the page and
-  // docks into its slot in the closing section once that slot reaches the same spot.
-  // It stays hidden while the hero's own form is on screen, so two forms never show.
-  var dock = document.querySelector("[data-dock]");
+  // A centred email-style bar floats 16px above the bottom of the screen while neither
+  // the hero form nor the footer form is on screen, so two forms never show at once.
+  // Tapping it brings you to the footer form, with the cursor in the first empty field.
+  var floatDl = document.querySelector("[data-float-dl]");
   var heroForm = document.querySelector(".hero [data-download]");
-  if (dock) {
-    var slot = dock.parentElement;
-    var footForm = dock.closest("form");
-    var nameRow = footForm.querySelector(".name-row");
-    var heroFormVisible = true;
-    var queued = false;
-    var updateDock = function () {
-      queued = false;
-      var floatTop = window.innerHeight - 16 - dock.offsetHeight;
-      var box = slot.getBoundingClientRect();
-      // Dock as soon as the footer's name fields come up from the bottom edge, so the
-      // floating email never sits on top of them; it then scrolls in under them.
-      var docked = box.top <= floatTop || (nameRow && nameRow.getBoundingClientRect().top < window.innerHeight);
-      dock.style.setProperty("--dock-left", box.left + "px");
-      dock.style.setProperty("--dock-width", box.width + "px");
-      // Floating, it lives at the top level of the page: inside the footer (its own
-      // stacking context) backdrop-filter can't see the page behind it. The email input
-      // and button keep submitting the footer form through their form attribute.
-      var home = docked ? slot : document.body;
-      if (dock.parentElement !== home) home.appendChild(dock);
-      dock.classList.toggle("is-floating", !docked);
-      dock.classList.toggle("is-hidden", !docked && heroFormVisible);
-      if (dock.classList.contains("is-hidden") && dock.contains(document.activeElement)) document.activeElement.blur();
+  var footForm = document.querySelector(".closing [data-download]");
+  if (floatDl && footForm) {
+    var heroFormVisible = !!heroForm, footFormVisible = false;
+    var updateFloat = function () {
+      var show = !heroFormVisible && !footFormVisible;
+      floatDl.classList.toggle("is-shown", show);
+      if (!show && document.activeElement === floatDl) document.activeElement.blur();
     };
-    var queueDock = function () { if (!queued) { queued = true; requestAnimationFrame(updateDock); } };
-    if (heroForm && "IntersectionObserver" in window) {
-      new IntersectionObserver(function (es) { heroFormVisible = es[0].isIntersecting; queueDock(); }).observe(heroForm);
+    if ("IntersectionObserver" in window) {
+      if (heroForm) new IntersectionObserver(function (es) { heroFormVisible = es[0].isIntersecting; updateFloat(); }).observe(heroForm);
+      new IntersectionObserver(function (es) { footFormVisible = es[0].isIntersecting; updateFloat(); }).observe(footForm);
     } else {
       heroFormVisible = false;
     }
-    window.addEventListener("scroll", queueDock, { passive: true });
-    window.addEventListener("resize", queueDock);
-    updateDock();
+    updateFloat();
 
-    // Only the email field floats. Tapping it (or tabbing into it) brings you down to the
-    // full form instead, with the cursor in the first empty field.
-    var goToForm = function (e) {
-      if (!dock.classList.contains("is-floating")) return;
-      if (e.type === "pointerdown") e.preventDefault();
+    floatDl.addEventListener("click", function () {
       var fields = [footForm.elements.firstName, footForm.elements.lastName, footForm.elements.email];
       var target = fields.filter(function (i) { return !i.value.trim(); })[0] || fields[0];
       target.focus({ preventScroll: true });
-      // Land with the slot 32px above the bottom of the screen, past the docking point.
-      var top = window.scrollY + slot.getBoundingClientRect().bottom - (window.innerHeight - 32);
+      // Land with the form 32px above the bottom of the screen.
+      var top = window.scrollY + footForm.getBoundingClientRect().bottom - (window.innerHeight - 32);
       window.scrollTo({ top: top, behavior: reduceMotion.matches ? "auto" : "smooth" });
-    };
-    dock.addEventListener("pointerdown", goToForm);
-    dock.addEventListener("focusin", function (e) { if (e.target.matches("input, button")) goToForm(e); });
+    });
   }
 
   /* ------------------------- Download (soft gate) ------------------------ */
@@ -370,7 +346,6 @@
 
   /* The download form (hero, footer and the floating copy): first name, last name, business email. */
   [].slice.call(document.querySelectorAll("[data-download]")).forEach(function (form) {
-    // form.elements, not querySelector: the footer's email field may be floating outside the form.
     var first = form.elements.firstName;
     var last = form.elements.lastName;
     var email = form.elements.email;

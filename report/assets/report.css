@@ -394,29 +394,41 @@ button, input { font: inherit; color: inherit; }
   .closing { min-height: max(clamp(429px, 389px + 9.88vw, 600px), 56.25vw); }
 }
 
-/* Floating download: the closing email field (only) rides 16px above the bottom of the screen
-   and docks into its slot here when you scroll to it (report.js toggles classes).
-   It takes the slot's left edge and width (report.js sets --dock-left/--dock-width),
-   so the handoff is seamless. */
-.dock-slot { min-height: 48px; }
-.dock.is-floating {
+/* Floating download shortcut: an email-style bar centred 16px above the bottom of the
+   screen, shown between the hero form and the footer form (report.js toggles is-shown).
+   Tapping it goes to the footer form. Backdrop glass, so the page shows through it. */
+.float-dl {
   position: fixed;
   z-index: 20;
-  left: var(--dock-left, var(--gutter));
+  left: 50%;
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  width: var(--dock-width, min(440px, calc(100vw - 2 * var(--gutter))));
-  transition: opacity 0.25s ease, visibility 0.25s;
-}
-.dock.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-/* While floating, the field is over the page, not the footer ribbon the WebGL lens
-   samples, so it switches to a backdrop glass that blurs whatever is behind it. */
-.dock.is-floating .field.glass {
+  width: min(440px, calc(100vw - 2 * var(--gutter)));
+  transform: translateX(-50%);
+  border: 0;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
   background: var(--glass-tint);
   -webkit-backdrop-filter: blur(16px) saturate(1.6);
   backdrop-filter: blur(16px) saturate(1.6);
   box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.35), inset -1px -1px 0 rgb(255 255 255 / 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
 }
-.dock.is-floating .field.glass > canvas { visibility: hidden; }
+.float-dl.is-shown { opacity: 1; visibility: visible; }
+.float-dl:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.float-dl-text { flex: 1; min-width: 0; font-weight: 400; color: var(--white-40); }
+.float-dl-go {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+}
 
 /* ---------- Two-column layouts once there's room for them ---------- */
 @container (min-width: 880px) {
@@ -553,7 +565,7 @@ html.modal-open { overflow: hidden; }
   .cursor-dot { transition: opacity 0.2s ease; }
   .partner-logos a img { transition: none; }
   .details[open] .details-panel { animation: none; }
-  .dock.is-floating { transition: none; }
+  .float-dl { transition: none; }
   .strip { overflow-x: auto; }
   .strip-track { animation: none !important; }
   .field button[aria-busy="true"] svg { animation: none; }
