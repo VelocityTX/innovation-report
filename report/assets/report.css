@@ -259,10 +259,11 @@ button, input { font: inherit; color: inherit; }
 .partner-logos a img { transition: transform 0.25s ease-out; }
 .partner-logos a:hover img { transform: scale(1.04); }
 
-/* Hover cursor for the partner logos: a soft white circle (mouse devices only). */
+/* Cursor: a soft white circle everywhere (mouse devices only). ~24px normally, 72px over
+   anything clickable. report.js moves it and moves it into the modal when that's open. */
 .cursor-dot {
   position: fixed;
-  z-index: 50;
+  z-index: 100;
   top: 0;
   left: 0;
   width: 72px;
@@ -272,12 +273,13 @@ button, input { font: inherit; color: inherit; }
   background: rgb(255 255 255 / 0.22);
   pointer-events: none;
   opacity: 0;
-  transform: translate3d(var(--x, -100px), var(--y, -100px), 0) scale(0.4);
-  transition: opacity 0.2s ease, transform 0.25s ease-out;
+  transform: translate3d(var(--x, -100px), var(--y, -100px), 0) scale(0.33);
+  transition: opacity 0.2s ease, transform 0.2s ease-out;
 }
-.cursor-dot.is-on { opacity: 1; transform: translate3d(var(--x), var(--y), 0) scale(1); }
+.cursor-dot.is-on { opacity: 1; }
+.cursor-dot.is-hover { transform: translate3d(var(--x), var(--y), 0) scale(1); }
 @media (hover: hover) and (pointer: fine) {
-  [data-cursor], [data-cursor] * { cursor: none; }
+  html.has-cursor, html.has-cursor * { cursor: none !important; }
 }
 .sponsor-logos { --strip-gap: clamp(44px, 36px + 2vw, 72px); }
 .sponsor-logos img { height: var(--h); }

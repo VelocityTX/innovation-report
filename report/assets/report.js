@@ -175,20 +175,26 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeMidwave);
   placeMidwave();
 
-  /* --------------------------- Hover cursor --------------------------- */
-  // Over [data-cursor] links (the partner logos), the pointer becomes a soft white circle.
+  /* ------------------------------ Cursor ------------------------------ */
+  // A soft white circle replaces the pointer everywhere (mouse devices only); it grows over
+  // anything clickable. While the modal is open it lives inside the dialog (top layer).
   var dot = document.querySelector(".cursor-dot");
   if (dot && matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    var follow = function (e) {
+    root.classList.add("has-cursor");
+    var CLICKABLE = "a, button, [role=option], label, input, select, textarea, [data-cursor]";
+    document.addEventListener("pointermove", function (e) {
       dot.style.setProperty("--x", e.clientX + "px");
       dot.style.setProperty("--y", e.clientY + "px");
-    };
-    document.addEventListener("pointermove", function (e) {
-      follow(e);
-      var over = e.target.closest && e.target.closest("[data-cursor]");
-      dot.classList.toggle("is-on", !!over);
+      dot.classList.add("is-on");
+      dot.classList.toggle("is-hover", !!(e.target.closest && e.target.closest(CLICKABLE)));
     }, { passive: true });
-    document.addEventListener("pointerleave", function () { dot.classList.remove("is-on"); });
+    document.documentElement.addEventListener("pointerleave", function () { dot.classList.remove("is-on"); });
+    var dlg = document.getElementById("details");
+    if (dlg) {
+      new MutationObserver(function () {
+        (dlg.open ? dlg : document.body).appendChild(dot);
+      }).observe(dlg, { attributes: true, attributeFilter: ["open"] });
+    }
   }
 
   /* --------------------------- Stat reveal --------------------------- */
