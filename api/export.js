@@ -26,7 +26,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== "GET") { res.setHeader("Allow", "GET"); return res.status(405).end(); }
 
   const expected = process.env.EXPORT_PASSWORD;
-  if (!expected || expected.length < 20) return res.status(503).send("Export is not configured.");
+  if (!expected || expected.length < 12) return res.status(503).send("Export is not configured.");
 
   try {
     await ensureSchema();
