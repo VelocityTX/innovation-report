@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>San Antonio &amp; The State of Innovation 2026 — Report</title>
+  <!-- QA shortcut: the report itself lives at "/". This opens it even before launch
+       (via ?view=report). A ?now=… test clock is passed along unchanged. -->
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://innovation-report-pmc6.vercel.app/">
+  <meta http-equiv="refresh" content="0; url=/?view=report">
+  <script>
+    (function () {
+      var now = /(?:^|[?&])now=([^&]*)/.exec(location.search);
+      location.replace("/?view=report" + (now ? "&now=" + now[1] : ""));
+    })();
+  </script>
+  <style>html { background: #000; color: #fff; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+  <p><a href="/?view=report">Open the San Antonio &amp; The State of Innovation report</a></p>
+</body>
+</html>

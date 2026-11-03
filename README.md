@@ -2,8 +2,34 @@
 
 Landing page for San Antonio & The State of Innovation (Nov 4, 2026). Plain static HTML/CSS/JS, no build step.
 
-- `/` — `index.html`, built from the Figma "SATX Teaser" desktop (1728×1117) and mobile (402×874) frames
-- `/old` — the previous landing page, preserved as-is (`noindex`)
+- `/` — `index.html`: the State of Innovation report. Before launch it hands over to `/countdown/`.
+- `/countdown/` — the countdown page (counts to launch, then goes to `/`)
+- `/report/` — shortcut that opens the report even before launch (`/?view=report`)
+- `/old` — the original landing page, preserved as-is (`noindex`)
+
+## Launch (Nov 4, 2026, 9:00 AM Central)
+
+Everything is controlled by **`launch.js`** in the repo root:
+
+- `SOI_LAUNCH_AT = "2026-11-04T15:00:00Z"` — the single launch timestamp (9:00 AM America/Chicago).
+- `SOI_OVERRIDE` — emergency switch. `null` = automatic; `"countdown"` = always countdown;
+  `"report"` = always report. Change it and push; Vercel redeploys in about a minute.
+
+Before launch, `/` redirects to `/countdown/`. At launch the countdown reaches zero and goes to
+`/`, which now shows the report. Tabs left open (or asleep) switch when they come back.
+
+### Testing the launch without changing the clock
+
+Add `?now=` to any URL. It only affects that page load (and is carried along when the
+countdown hands over to `/`); normal visitors never have it.
+
+| URL | Simulates |
+|---|---|
+| `/?now=launch-1h` | an hour before launch → countdown |
+| `/countdown/?now=launch-10s` | watch the countdown hit zero and switch to the report |
+| `/?now=launch` | the exact launch moment → report |
+| `/?now=launch%2B1h` | an hour after launch → report (`%2B` = `+`) |
+| `/?now=2026-11-04T14:59:50Z` | any absolute instant |
 
 ## Structure
 
