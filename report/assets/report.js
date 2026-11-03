@@ -130,6 +130,7 @@
         var clone = li.cloneNode(true);
         clone.setAttribute("aria-hidden", "true");
         clone.querySelectorAll("img").forEach(function (img) { img.alt = ""; });
+        clone.querySelectorAll("a").forEach(function (link) { link.tabIndex = -1; });
         s.track.appendChild(clone);
         s.clones.push(clone);
       });
@@ -159,6 +160,36 @@
   });
   render();
   syncAll();
+
+  /* ------------------------- Midwave placement ------------------------- */
+  // Keeps the background band centred on the stat cards at every size.
+  var inside = document.querySelector(".inside");
+  var statsList = document.querySelector(".stats");
+  function placeMidwave() {
+    if (!inside || !statsList) return;
+    var a = inside.getBoundingClientRect(), b = statsList.getBoundingClientRect();
+    inside.style.setProperty("--stats-mid", Math.round(b.top - a.top + b.height / 2) + "px");
+  }
+  window.addEventListener("resize", placeMidwave);
+  window.addEventListener("load", placeMidwave);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeMidwave);
+  placeMidwave();
+
+  /* --------------------------- Hover cursor --------------------------- */
+  // Over [data-cursor] links (the partner logos), the pointer becomes a soft white circle.
+  var dot = document.querySelector(".cursor-dot");
+  if (dot && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var follow = function (e) {
+      dot.style.setProperty("--x", e.clientX + "px");
+      dot.style.setProperty("--y", e.clientY + "px");
+    };
+    document.addEventListener("pointermove", function (e) {
+      follow(e);
+      var over = e.target.closest && e.target.closest("[data-cursor]");
+      dot.classList.toggle("is-on", !!over);
+    }, { passive: true });
+    document.addEventListener("pointerleave", function () { dot.classList.remove("is-on"); });
+  }
 
   /* --------------------------- Stat reveal --------------------------- */
   // The three headline numbers resolve like a fast data readout when the cards come
@@ -325,7 +356,9 @@
     if (!workplace) { fieldset.setAttribute("aria-invalid", "true"); missing.push({ el: f.workplace[0], label: "where you work" }); }
     [["company", "company"], ["age", "age"], ["firstName", "first name"], ["lastName", "last name"]].forEach(function (k) {
       var el = f[k[0]];
-      if (!el.value || !el.value.trim()) { el.setAttribute("aria-invalid", "true"); missing.push({ el: el, label: k[1] }); }
+      // Age is a custom dropdown: its value lives in a hidden input; outline and focus the button.
+      var target = k[0] === "age" ? document.getElementById("d-age-btn") : el;
+      if (!el.value || !el.value.trim()) { target.setAttribute("aria-invalid", "true"); missing.push({ el: target, label: k[1] }); }
     });
     if (missing.length) {
       var labels = missing.map(function (m) { return m.label; });
@@ -350,6 +383,82 @@
     detailsForm.hidden = true;
     done.hidden = false;
     done.focus();
+  });
+
+  /* Liquid Glass dropdown (listbox pattern): replaces the native <select> for Age. */
+  [].slice.call(document.querySelectorAll("[data-dropdown]")).forEach(function (dd) {
+    var trigger = dd.querySelector(".dropdown-trigger");
+    var valueEl = dd.querySelector(".dropdown-value");
+    var list = dd.querySelector(".dropdown-list");
+    var hidden = dd.querySelector("input[type=hidden]");
+    var options = [].slice.call(list.querySelectorAll("[role=option]"));
+    var active = -1;
+
+    function setActive(i) {
+      active = Math.max(0, Math.min(options.length - 1, i));
+      options.forEach(function (o, k) { o.classList.toggle("is-active", k === active); });
+      list.setAttribute("aria-activedescendant", options[active].id);
+      options[active].scrollIntoView({ block: "nearest" });
+    }
+    // Positioned against the screen (not the modal) so the panel's scroll area can't clip it:
+    // below the button when there's room, otherwise above.
+    function place() {
+      var r = trigger.getBoundingClientRect();
+      var h = list.offsetHeight;
+      var below = window.innerHeight - r.bottom;
+      var up = below < h + 16 && r.top > below;
+      list.classList.toggle("up", up);
+      list.style.left = r.left + "px";
+      list.style.width = r.width + "px";
+      list.style.top = (up ? r.top - 8 - h : r.bottom + 8) + "px";
+    }
+    function open() {
+      if (!list.hidden) return;
+      list.hidden = false;
+      place();
+      trigger.setAttribute("aria-expanded", "true");
+      var sel = options.findIndex(function (o) { return o.getAttribute("aria-selected") === "true"; });
+      setActive(sel >= 0 ? sel : 0);
+      list.focus();
+    }
+    function close(refocus) {
+      if (list.hidden) return;
+      list.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+      if (refocus) trigger.focus();
+    }
+    function choose(i) {
+      options.forEach(function (o, k) { o.setAttribute("aria-selected", k === i ? "true" : "false"); });
+      hidden.value = options[i].textContent.trim();
+      valueEl.textContent = hidden.value;
+      valueEl.classList.remove("is-placeholder");
+      trigger.removeAttribute("aria-invalid");
+      close(true);
+    }
+
+    trigger.addEventListener("click", function () { if (list.hidden) open(); else close(true); });
+    trigger.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); open(); }
+    });
+    list.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
+      else if (e.key === "Home") { e.preventDefault(); setActive(0); }
+      else if (e.key === "End") { e.preventDefault(); setActive(options.length - 1); }
+      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(active); }
+      else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(true); }  // don't close the modal
+      else if (e.key === "Tab") { close(false); }
+    });
+    options.forEach(function (o, i) {
+      o.addEventListener("mousemove", function () { if (active !== i) setActive(i); });
+      o.addEventListener("click", function () { choose(i); });
+    });
+    document.addEventListener("pointerdown", function (e) { if (!dd.contains(e.target)) close(false); });
+    window.addEventListener("resize", function () { if (!list.hidden) place(); });
+    var scroller = dd.closest(".details-panel");
+    if (scroller) scroller.addEventListener("scroll", function () { if (!list.hidden) place(); }, { passive: true });
+    // The dialog's own Escape/cancel shouldn't fire while the list is open.
+    if (dialog) dialog.addEventListener("cancel", function (e) { if (!list.hidden) { e.preventDefault(); close(true); } });
   });
 
   /* Step 1: business email (hero, footer and the floating field). */
