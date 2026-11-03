@@ -275,7 +275,7 @@
   }
 
   /* ------------------------- Floating download ------------------------- */
-  // The closing field floats 16px above the bottom of the screen across the page and
+  // The closing email field floats 16px above the bottom of the screen across the page and
   // docks into its slot in the closing section once that slot reaches the same spot.
   // It stays hidden while the hero's own form is on screen, so two forms never show.
   var dock = document.querySelector("[data-dock]");
@@ -304,6 +304,21 @@
     window.addEventListener("scroll", queueDock, { passive: true });
     window.addEventListener("resize", queueDock);
     updateDock();
+
+    // Only the email field floats. Tapping it (or tabbing into it) brings you down to the
+    // full form instead, with the cursor in the first empty field.
+    var footForm = dock.closest("form");
+    var goToForm = function (e) {
+      if (!dock.classList.contains("is-floating")) return;
+      if (e.type === "pointerdown") e.preventDefault();
+      var target = [].slice.call(footForm.querySelectorAll("input")).filter(function (i) { return !i.value.trim(); })[0] || footForm.querySelector("input");
+      target.focus({ preventScroll: true });
+      // Land with the slot 32px above the bottom of the screen, past the docking point.
+      var top = window.scrollY + slot.getBoundingClientRect().bottom - (window.innerHeight - 32);
+      window.scrollTo({ top: top, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    };
+    dock.addEventListener("pointerdown", goToForm);
+    dock.addEventListener("focusin", function (e) { if (e.target.matches("input, button")) goToForm(e); });
   }
 
   /* ------------------------- Download (soft gate) ------------------------ */

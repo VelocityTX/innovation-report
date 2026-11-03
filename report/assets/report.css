@@ -169,8 +169,8 @@ button, input { font: inherit; color: inherit; }
 .download-fields { display: flex; flex-direction: column; gap: 13px; }
 .name-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 13px; }
 .field {
-  height: 48px;
-  border-radius: 8px;
+  height: 412px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -201,7 +201,7 @@ button, input { font: inherit; color: inherit; }
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 4px;
+  border-radius: 8px;
   background: #fff;
   color: #000;
   cursor: pointer;
@@ -394,11 +394,11 @@ button, input { font: inherit; color: inherit; }
   .closing { min-height: max(clamp(429px, 389px + 9.88vw, 600px), 56.25vw); }
 }
 
-/* Floating download: the closing field rides 16px above the bottom of the screen
+/* Floating download: the closing email field (only) rides 16px above the bottom of the screen
    and docks into its slot here when you scroll to it (report.js toggles classes).
    It takes the slot's left edge and width (report.js sets --dock-left/--dock-width),
    so the handoff is seamless. */
-.dock-slot { min-height: 109px; }  /* names row + email field */
+.dock-slot { min-height: 48px; }
 .dock.is-floating {
   position: fixed;
   z-index: 20;
