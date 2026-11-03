@@ -282,15 +282,24 @@
   var heroForm = document.querySelector(".hero [data-download]");
   if (dock) {
     var slot = dock.parentElement;
+    var footForm = dock.closest("form");
+    var nameRow = footForm.querySelector(".name-row");
     var heroFormVisible = true;
     var queued = false;
     var updateDock = function () {
       queued = false;
       var floatTop = window.innerHeight - 16 - dock.offsetHeight;
       var box = slot.getBoundingClientRect();
-      var docked = box.top <= floatTop;
+      // Dock as soon as the footer's name fields come up from the bottom edge, so the
+      // floating email never sits on top of them; it then scrolls in under them.
+      var docked = box.top <= floatTop || (nameRow && nameRow.getBoundingClientRect().top < window.innerHeight);
       dock.style.setProperty("--dock-left", box.left + "px");
       dock.style.setProperty("--dock-width", box.width + "px");
+      // Floating, it lives at the top level of the page: inside the footer (its own
+      // stacking context) backdrop-filter can't see the page behind it. The email input
+      // and button keep submitting the footer form through their form attribute.
+      var home = docked ? slot : document.body;
+      if (dock.parentElement !== home) home.appendChild(dock);
       dock.classList.toggle("is-floating", !docked);
       dock.classList.toggle("is-hidden", !docked && heroFormVisible);
       if (dock.classList.contains("is-hidden") && dock.contains(document.activeElement)) document.activeElement.blur();
@@ -307,11 +316,11 @@
 
     // Only the email field floats. Tapping it (or tabbing into it) brings you down to the
     // full form instead, with the cursor in the first empty field.
-    var footForm = dock.closest("form");
     var goToForm = function (e) {
       if (!dock.classList.contains("is-floating")) return;
       if (e.type === "pointerdown") e.preventDefault();
-      var target = [].slice.call(footForm.querySelectorAll("input")).filter(function (i) { return !i.value.trim(); })[0] || footForm.querySelector("input");
+      var fields = [footForm.elements.firstName, footForm.elements.lastName, footForm.elements.email];
+      var target = fields.filter(function (i) { return !i.value.trim(); })[0] || fields[0];
       target.focus({ preventScroll: true });
       // Land with the slot 32px above the bottom of the screen, past the docking point.
       var top = window.scrollY + slot.getBoundingClientRect().bottom - (window.innerHeight - 32);
@@ -361,10 +370,11 @@
 
   /* The download form (hero, footer and the floating copy): first name, last name, business email. */
   [].slice.call(document.querySelectorAll("[data-download]")).forEach(function (form) {
-    var first = form.querySelector("input[name=firstName]");
-    var last = form.querySelector("input[name=lastName]");
-    var email = form.querySelector("input[type=email]");
-    var msg = form.querySelector(".download-msg");
+    // form.elements, not querySelector: the footer's email field may be floating outside the form.
+    var first = form.elements.firstName;
+    var last = form.elements.lastName;
+    var email = form.elements.email;
+    var msg = document.getElementById(email.getAttribute("aria-describedby"));
 
     function valid(input) {
       var v = input.value.trim();
@@ -382,10 +392,11 @@
     }
 
     // Clear each red outline as soon as that field becomes valid.
-    form.addEventListener("input", function (e) {
-      var t = e.target;
-      if (t.getAttribute("aria-invalid") === "true" && valid(t)) t.removeAttribute("aria-invalid");
-      if (!form.querySelector("[aria-invalid=true]")) clearError();
+    [first, last, email].forEach(function (input) {
+      input.addEventListener("input", function () {
+        if (input.getAttribute("aria-invalid") === "true" && valid(input)) input.removeAttribute("aria-invalid");
+        if (![first, last, email].some(function (i) { return i.getAttribute("aria-invalid") === "true"; })) clearError();
+      });
     });
 
     form.addEventListener("submit", function (e) {

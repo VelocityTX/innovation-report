@@ -408,6 +408,15 @@ button, input { font: inherit; color: inherit; }
   transition: opacity 0.25s ease, visibility 0.25s;
 }
 .dock.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* While floating, the field is over the page, not the footer ribbon the WebGL lens
+   samples, so it switches to a backdrop glass that blurs whatever is behind it. */
+.dock.is-floating .field.glass {
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.35), inset -1px -1px 0 rgb(255 255 255 / 0.12);
+}
+.dock.is-floating .field.glass > canvas { visibility: hidden; }
 
 /* ---------- Two-column layouts once there's room for them ---------- */
 @container (min-width: 880px) {
