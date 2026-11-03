@@ -223,6 +223,35 @@
     });
   }
 
+  /* ------------------------- Floating download ------------------------- */
+  // The closing field floats 16px above the bottom of the screen across the page and
+  // docks into its slot in the closing section once that slot reaches the same spot.
+  // It stays hidden while the hero's own form is on screen, so two forms never show.
+  var dock = document.querySelector("[data-dock]");
+  var heroForm = document.querySelector(".hero [data-download]");
+  if (dock) {
+    var slot = dock.parentElement;
+    var heroFormVisible = true;
+    var queued = false;
+    var updateDock = function () {
+      queued = false;
+      var floatTop = window.innerHeight - 16 - dock.offsetHeight;
+      var docked = slot.getBoundingClientRect().top <= floatTop;
+      dock.classList.toggle("is-floating", !docked);
+      dock.classList.toggle("is-hidden", !docked && heroFormVisible);
+      if (dock.classList.contains("is-hidden") && dock.contains(document.activeElement)) document.activeElement.blur();
+    };
+    var queueDock = function () { if (!queued) { queued = true; requestAnimationFrame(updateDock); } };
+    if (heroForm && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { heroFormVisible = es[0].isIntersecting; queueDock(); }).observe(heroForm);
+    } else {
+      heroFormVisible = false;
+    }
+    window.addEventListener("scroll", queueDock, { passive: true });
+    window.addEventListener("resize", queueDock);
+    updateDock();
+  }
+
   /* ------------------------- Download (soft gate) ------------------------ */
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 

@@ -336,18 +336,34 @@ button, input { font: inherit; color: inherit; }
 .closing .download-title { text-align: center; }
 .closing .download-msg { margin-inline: auto; }
 
+/* Floating download: the closing field rides 16px above the bottom of the screen
+   and docks into its slot here when you scroll to it (report.js toggles classes).
+   Same centre and width in both states, so the handoff is seamless. */
+.dock-slot { min-height: 48px; }
+.dock.is-floating {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: min(440px, calc(100vw - 2 * var(--gutter)));
+  transform: translateX(-50%);
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+.dock.is-floating .download-msg { margin-inline: auto; }
+.dock.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
 /* ---------- Two-column layouts once there's room for them ---------- */
 @container (min-width: 880px) {
   .split { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: end; }
   .consortium .split > .heading { grid-column: 1 / span 5; }
-  .consortium .split > .logos-strip { grid-column: 7 / -1; margin-top: 0; }
+  .consortium .split > .logos-strip { grid-column: 7 / -1; margin-top: 0; align-self: start; }
   .consortium .strip { margin-inline: 0; }
   .consortium .strip:not(.is-marquee) .strip-track { padding-inline: 0; margin-left: auto; }
   /* Scale the partner logos with their half-width column so they always fit (no marquee).
      (50cqw − 144px) ÷ 275px = scale at which the four logos plus gaps fill the column. */
   .partner-logos img { height: clamp(calc(var(--h) * 1.05), calc((50cqw - 144px) * var(--r)), calc(var(--h) * 1.8)); }
 
-  .quote .split > h2 { grid-column: 1 / span 6; }
+  .quote .split > h2 { grid-column: 1 / span 6; align-self: start; }
   .quote .split > figure { grid-column: 8 / -1; margin-top: 0; }
 
   .inside .split > h2 { grid-column: 1 / span 6; }
@@ -380,6 +396,7 @@ button, input { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .ribbon video { transition: none; }
+  .dock.is-floating { transition: none; }
   .strip { overflow-x: auto; }
   .strip-track { animation: none !important; }
   .field button[aria-busy="true"] svg { animation: none; }
