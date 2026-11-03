@@ -23,6 +23,18 @@
       } catch (e) {}
     })();
   </script>
+  <script>
+    // Blur In: hold the headings hidden until blur-in.js has split them (max 3s).
+    (function () {
+      try {
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+          var r = document.documentElement;
+          r.classList.add("blur-in-pending");
+          setTimeout(function () { r.classList.remove("blur-in-pending"); }, 3000);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="/report/assets/report.css">
 </head>
 <body>
@@ -44,7 +56,7 @@
 
     <div class="hero-inner">
       <div class="topbar">
-        <ul class="mini-logos" aria-label="Presented by">
+        <ul class="mini-logos" aria-label="Presented by" data-blur-in-items>
           <li><a href="https://www.geekdom.com" target="_blank" rel="noopener"><img class="l-geekdom" src="/assets/logos/geekdom.svg" alt="Geekdom" width="76" height="29"></a></li>
           <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img class="l-port" src="/assets/logos/port-san-antonio.svg" alt="Port San Antonio" width="82" height="36"></a></li>
           <li><a href="https://satechbloc.com/" target="_blank" rel="noopener"><img class="l-techbloc" src="/assets/logos/techbloc.svg" alt="Tech Bloc" width="56" height="36"></a></li>
@@ -59,13 +71,13 @@
       <div class="space-a" aria-hidden="true"></div>
 
       <div class="hero-copy">
-        <h1 class="title">
+        <h1 class="title" data-blur-in>
           <span class="year">2026</span>
           <span>San Antonio</span>
           <span>State of</span>
           <span>Innovation</span>
         </h1>
-        <p class="subtitle trim">A regional baseline for growth, investment and action</p>
+        <p class="subtitle trim" data-blur-in-block>A regional baseline for growth, investment and action</p>
       </div>
 
       <div class="space-b" aria-hidden="true"></div>
@@ -91,11 +103,11 @@
       <div class="wrap">
         <div class="split">
           <div class="heading">
-            <p class="eyebrow trim">Presented by</p>
-            <h2 id="consortium-title">The Innovation SATX Consortium</h2>
+            <p class="eyebrow trim" data-blur-in-block>Presented by</p>
+            <h2 id="consortium-title" data-blur-in>The Innovation SATX Consortium</h2>
           </div>
           <div class="logos-strip">
-            <div class="strip partner-logos" data-strip>
+            <div class="strip partner-logos" data-strip data-blur-in-items>
               <ul class="strip-track" role="list">
                 <li><img src="/assets/logos/geekdom.svg" alt="Geekdom" style="--h: 28.5px; --r: 0.1036" width="76" height="29"></li>
                 <li><img src="/assets/logos/port-san-antonio.svg" alt="Port San Antonio" style="--h: 35.9px; --r: 0.1305" width="82" height="36"></li>
@@ -112,12 +124,12 @@
     <section class="section quote" aria-labelledby="quote-title">
       <div class="wrap">
         <div class="split">
-          <h2 id="quote-title"><span>The next chapter</span> <span>is about broadening</span> <span>that growth</span></h2>
+          <h2 id="quote-title" data-blur-in><span>The next chapter</span> <span>is about broadening</span> <span>that growth</span></h2>
           <figure class="figure-reset">
             <blockquote>
-              <p class="prose trim">San Antonio has built a large, diverse and growing economy. The challenge before us is not simply to continue that growth, but to broaden it in ways that create greater opportunity, productivity and prosperity for the region.</p>
+              <p class="prose trim" data-blur-in-block>San Antonio has built a large, diverse and growing economy. The challenge before us is not simply to continue that growth, but to broaden it in ways that create greater opportunity, productivity and prosperity for the region.</p>
             </blockquote>
-            <figcaption class="trim">— The Innovation SATX Consortium</figcaption>
+            <figcaption class="trim" data-blur-in-block>— The Innovation SATX Consortium</figcaption>
           </figure>
         </div>
       </div>
@@ -127,8 +139,8 @@
     <section class="section inside" aria-labelledby="inside-title">
       <div class="wrap">
         <div class="split">
-          <h2 id="inside-title">Inside the Report</h2>
-          <p class="intro prose trim">A first look at the numbers shaping San Antonio’s innovation economy.</p>
+          <h2 id="inside-title" data-blur-in>Inside the Report</h2>
+          <p class="intro prose trim" data-blur-in-block>A first look at the numbers shaping San Antonio’s innovation economy.</p>
         </div>
         <ul class="stats" role="list">
           <li class="stat">
@@ -140,7 +152,7 @@
               <span class="sr-only">Up 2.5% from 53,703 in 2024.</span>
             </p>
             <div class="stat-body">
-              <p class="stat-desc">Total jobs across the report’s nine defined innovation-intensive sectors.</p>
+              <p class="stat-desc" data-blur-in-block>Total jobs across the report’s nine defined innovation-intensive sectors.</p>
             </div>
           </li>
           <li class="stat">
@@ -148,7 +160,7 @@
             <p class="stat-value trim"><span class="sr-only">$2.55B</span><span class="stat-count" aria-hidden="true" data-to="2.55" data-from="1" data-decimals="2" data-prefix="$" data-suffix="B">$2.55B</span></p>
             <p class="stat-meta">Active contracts as of September 14th, 2026</p>
             <div class="stat-body">
-              <p class="stat-desc">Federal R&amp;D obligations across qualifying active contracts with a primary place of performance in San Antonio. Reflects contract value, not annual expenditures.</p>
+              <p class="stat-desc" data-blur-in-block>Federal R&amp;D obligations across qualifying active contracts with a primary place of performance in San Antonio. Reflects contract value, not annual expenditures.</p>
             </div>
           </li>
           <li class="stat">
@@ -160,7 +172,7 @@
               <span class="sr-only">Down 78% from $141.05M in 2024.</span>
             </p>
             <div class="stat-body">
-              <p class="stat-desc">Venture funding recorded for regional companies in Crunchbase.</p>
+              <p class="stat-desc" data-blur-in-block>Venture funding recorded for regional companies in Crunchbase.</p>
             </div>
           </li>
         </ul>
@@ -171,10 +183,10 @@
     <section class="section greater" aria-labelledby="greater-title">
       <div class="wrap">
         <div class="split">
-          <div class="badge"><img src="/report/assets/greater-satx.svg" alt="greater:SATX" width="88" height="44"></div>
+          <div class="badge" data-blur-in-block><img src="/report/assets/greater-satx.svg" alt="greater:SATX" width="88" height="44"></div>
           <div class="text">
-            <h2 id="greater-title">Supporting SATX Innovation</h2>
-            <p class="prose trim">greater:SATX is a public-private economic development organization supporting San Antonio’s economic growth. As the study’s data partner, it validates the methodology against national best practices and independently verifies the underlying data.</p>
+            <h2 id="greater-title" data-blur-in>Supporting SATX Innovation</h2>
+            <p class="prose trim" data-blur-in-block>greater:SATX is a public-private economic development organization supporting San Antonio’s economic growth. As the study’s data partner, it validates the methodology against national best practices and independently verifies the underlying data.</p>
           </div>
         </div>
       </div>
@@ -183,8 +195,8 @@
     <!-- ===================== Sponsors ===================== -->
     <section class="section sponsors" aria-labelledby="sponsors-title">
       <div class="wrap">
-        <h2 id="sponsors-title">Thank you to our sponsors</h2>
-        <div class="strip sponsor-logos" data-strip>
+        <h2 id="sponsors-title" data-blur-in>Thank you to our sponsors</h2>
+        <div class="strip sponsor-logos" data-strip data-blur-in-items>
           <ul class="strip-track" role="list">
             <li><img src="/report/assets/sponsors/aprio.png" alt="Aprio" style="--h: 46px" width="104" height="46"></li>
             <li><img src="/report/assets/sponsors/frost.png" alt="Frost" style="--h: 46px" width="117" height="46"></li>
@@ -235,6 +247,7 @@
     </div>
   </footer>
 
+  <script src="/report/assets/blur-in.js"></script>
   <script src="/report/assets/report.js"></script>
   <script src="/report/assets/report-glass.js" defer></script>
 </body>

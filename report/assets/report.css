@@ -159,7 +159,7 @@ button, input { font: inherit; color: inherit; }
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
-.title span { display: block; }
+.title > span:not(.sr-only) { display: block; }
 .title .year { font-weight: 100; color: var(--muted); }
 .subtitle { margin-top: 16px; max-width: clamp(294px, 196px + 24.4vw, 520px); font-size: clamp(16px, 13.6px + 0.6vw, 24px); line-height: 1; }
 
@@ -259,7 +259,7 @@ button, input { font: inherit; color: inherit; }
 .quote .wrap > * + * { margin-top: 24px; }
 .quote blockquote { margin: 0; }
 .quote blockquote .prose { font-size: clamp(16px, 13.6px + 0.6vw, 24px); }
-.quote h2 span { display: block; }
+.quote h2 > span:not(.sr-only) { display: block; }
 .quote figcaption { margin-top: 24px; }
 
 /* ---------- Inside the Report ---------- */
@@ -393,6 +393,23 @@ button, input { font: inherit; color: inherit; }
 
 /* Mobile: Figma's left-aligned stack. The greater badge is centred as drawn. */
 .figure-reset { margin: 0; }
+
+/* ---------- Blur In (blur-in.js): ONONC Blur In Text values ---------- */
+.blur-in-pending [data-blur-in],
+.blur-in-pending [data-blur-in-block],
+.blur-in-pending [data-blur-in-items] { visibility: hidden; }
+.bi-word,
+.bi-block,
+.bi-item {
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(10px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
+}
+.bi-word { display: inline-block; }
+.bi-in .bi-word,
+.bi-in .bi-item,
+.bi-block.bi-in { opacity: 1; transform: none; filter: blur(0); }
 
 @media (prefers-reduced-motion: reduce) {
   .ribbon video { transition: none; }
