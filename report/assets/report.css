@@ -418,7 +418,11 @@ button, input { font: inherit; color: inherit; }
   color: #fff;
   overflow: visible;
 }
-.details::backdrop { background: rgb(0 0 0 / 0.6); }
+.details::backdrop {
+  background: rgb(0 0 0 / 0.72);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+}
 .details-panel {
   position: relative;
   max-height: calc(100svh - 32px);
@@ -432,7 +436,6 @@ button, input { font: inherit; color: inherit; }
 .details-title { margin: 0 48px 0 0; font-size: clamp(28px, 24.7px + 0.81vw, 36px); font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; color: var(--heading); }
 .details-sub { margin: 12px 0 0; font-size: 16px; line-height: 1.25; color: rgb(255 255 255 / 0.75); }
 .details-form { display: flex; flex-direction: column; gap: 20px; }
-.details-form .details-sub { margin-top: -8px; }
 .details-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; }
 .details-field > label, .details-field > legend { padding: 0; font-size: 14px; font-weight: 400; color: rgb(255 255 255 / 0.75); }
 .details-field > legend { margin-bottom: 8px; }
