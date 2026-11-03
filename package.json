@@ -1,0 +1,10 @@
+{
+  "name": "innovation-report",
+  "private": true,
+  "description": "State of Innovation report site. Static pages plus two serverless endpoints (api/submit, api/export).",
+  "engines": { "node": "24.x" },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "exceljs": "^4.4.0"
+  }
+}

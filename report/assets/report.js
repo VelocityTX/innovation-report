@@ -309,9 +309,24 @@
   /* ------------------------- Download (soft gate) ------------------------ */
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-  // Hook for Mailchimp later: must never throw or delay the download.
+  // Saves the visitor to our database (/api/submit). Must never throw or delay the download:
+  // fire-and-forget, with one quiet retry if the first attempt fails.
   function collect(data) {
-    try { /* intentionally empty until the Mailchimp form address is provided */ } catch (e) {}
+    try {
+      var send = function () {
+        return fetch("/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ firstName: data.firstName, lastName: data.lastName, email: data.email }),
+          keepalive: true
+        });
+      };
+      send().then(function (r) {
+        if (!r.ok && r.status >= 500) setTimeout(function () { send().catch(function () {}); }, 2500);
+      }).catch(function () {
+        setTimeout(function () { try { send().catch(function () {}); } catch (e) {} }, 2500);
+      });
+    } catch (e) {}
   }
 
   function startDownload() {
