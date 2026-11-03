@@ -15,7 +15,6 @@
 
 :root {
   --black: #000;
-  --ink-quote: #050505;
   --card: #141414;
   --heading: #f5f6f2;
   --muted: #a5a5a5;
@@ -166,13 +165,16 @@ button, input { font: inherit; color: inherit; }
 /* ---------- Download form (hero + footer) ---------- */
 .download { width: min(100%, 440px); }
 .download-title { margin: 0 0 13px; font-weight: 300; line-height: 0.99; }
+/* Figma 326:337: first + last name side by side above the email field, 13px apart. */
+.download-fields { display: flex; flex-direction: column; gap: 13px; }
+.name-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 13px; }
 .field {
   height: 48px;
-  border-radius: 999px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 4px 4px 16px;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
 }
 .field:focus-within { outline: 2px solid #fff; outline-offset: 3px; }
 /* Invalid / missing email: red outline instead of a message. */
@@ -199,7 +201,7 @@ button, input { font: inherit; color: inherit; }
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 8px;
   background: #fff;
   color: #000;
   cursor: pointer;
@@ -274,10 +276,11 @@ button, input { font: inherit; color: inherit; }
   pointer-events: none;
   opacity: 0;
   transform: translate3d(var(--x, -100px), var(--y, -100px), 0) scale(0.33);
-  transition: opacity 0.2s ease, transform 0.2s ease-out;
+  transition: opacity 0.2s ease, transform 0.2s ease-out, background-color 0.2s ease;
 }
 .cursor-dot.is-on { opacity: 1; }
-.cursor-dot.is-hover { transform: translate3d(var(--x), var(--y), 0) scale(1); }
+/* Over clickables the dot keeps its size and turns transparent blue. */
+.cursor-dot.is-hover { background: rgb(1 122 219 / 0.6); }
 @media (hover: hover) and (pointer: fine) {
   html.has-cursor, html.has-cursor * { cursor: none !important; }
 }
@@ -285,7 +288,7 @@ button, input { font: inherit; color: inherit; }
 .sponsor-logos img { height: var(--h); }
 
 /* ---------- Quote ---------- */
-.quote { background: var(--ink-quote); }
+.quote { background: var(--black); }
 /* Mobile: 32px between a section headline and its body copy. */
 .quote figure { margin-top: 32px; }
 .quote blockquote { margin: 0; }
@@ -382,32 +385,38 @@ button, input { font: inherit; color: inherit; }
 /* The closing section (which owns the floating download field) sits above all page
    content, so the floating field is always in front. */
 .closing { z-index: 2; }
-/* The closing download sits in the middle of the section. */
-.closing { align-items: center; padding-block: clamp(32px, 22.3px + 2.41vw, 64px); }
+/* Figma 326:653: the report title, then the download form below it, at the bottom left. */
+.closing { padding-block: clamp(32px, 22.3px + 2.41vw, 64px); }
+.closing-title { margin-bottom: clamp(35px, 30px + 1.2vw, 56px); }
 /* With the full-width 16:9 art, the section is at least as tall as the video frame,
    so the ribbon is never cut off at the top. */
 @media (min-aspect-ratio: 5/8) {
   .closing { min-height: max(clamp(429px, 389px + 9.88vw, 600px), 56.25vw); }
 }
-.closing .download { margin-inline: auto; }
-.closing .download-title { text-align: center; }
-.closing .download-msg { margin-inline: auto; }
 
-/* Floating download: the closing field rides 16px above the bottom of the screen
+/* Floating download: the closing email field (only) rides 16px above the bottom of the screen
    and docks into its slot here when you scroll to it (report.js toggles classes).
-   Same centre and width in both states, so the handoff is seamless. */
+   It takes the slot's left edge and width (report.js sets --dock-left/--dock-width),
+   so the handoff is seamless. */
 .dock-slot { min-height: 48px; }
 .dock.is-floating {
   position: fixed;
   z-index: 20;
-  left: 50%;
+  left: var(--dock-left, var(--gutter));
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  width: min(440px, calc(100vw - 2 * var(--gutter)));
-  transform: translateX(-50%);
+  width: var(--dock-width, min(440px, calc(100vw - 2 * var(--gutter))));
   transition: opacity 0.25s ease, visibility 0.25s;
 }
-.dock.is-floating .download-msg { margin-inline: auto; }
 .dock.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* While floating, the field is over the page, not the footer ribbon the WebGL lens
+   samples, so it switches to a backdrop glass that blurs whatever is behind it. */
+.dock.is-floating .field.glass {
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.35), inset -1px -1px 0 rgb(255 255 255 / 0.12);
+}
+.dock.is-floating .field.glass > canvas { visibility: hidden; }
 
 /* ---------- Two-column layouts once there's room for them ---------- */
 @container (min-width: 880px) {
@@ -478,47 +487,10 @@ button, input { font: inherit; color: inherit; }
   padding: clamp(24px, 20px + 1vw, 36px);
 }
 .details-panel > :not(canvas) { position: relative; }
-.details[open] .details-panel { animation: details-in 0.5s ease-out backwards; }  /* not "both": a lingering transform/filter would break the fixed-position dropdown */
+.details[open] .details-panel { animation: details-in 0.5s ease-out backwards; }  
 @keyframes details-in { from { opacity: 0; transform: translateY(12px); filter: blur(10px); } }
 .details-title { margin: 0 48px 0 0; font-size: clamp(28px, 24.7px + 0.81vw, 36px); font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; color: var(--heading); }
 .details-sub { margin: 12px 0 0; font-size: 16px; line-height: 1.25; color: rgb(255 255 255 / 0.75); }
-.details-form { display: flex; flex-direction: column; gap: 20px; }
-.details-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; }
-.details-field > label, .details-field > legend { padding: 0; font-size: 14px; font-weight: 400; color: rgb(255 255 255 / 0.75); }
-.details-field > legend { margin-bottom: 8px; }
-.details-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.details-input {
-  height: 48px;
-  width: 100%;
-  padding: 0 18px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.08);
-  color: #fff;
-  font-weight: 400;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
-.details-input:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-.segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.segmented label { position: relative; cursor: pointer; }
-.segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.segmented span {
-  display: grid;
-  place-items: center;
-  height: 48px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.08);
-  font-weight: 400;
-  transition: background 0.15s, color 0.15s;
-}
-.segmented input:checked + span { background: #fff; color: #000; border-color: #fff; font-weight: 500; }
-.segmented input:focus-visible + span { outline: 2px solid #fff; outline-offset: 3px; }
-/* Same rule as the email field: invalid → red outline, message for screen readers only. */
-.details-input[aria-invalid="true"],
-fieldset[aria-invalid="true"] .segmented span { outline: 2px solid #ff4d4f; outline-offset: 3px; }
 .details-submit {
   height: 48px;
   margin-top: 8px;
@@ -552,53 +524,6 @@ fieldset[aria-invalid="true"] .segmented span { outline: 2px solid #ff4d4f; outl
   cursor: pointer;
 }
 .details-close svg { width: 22px; height: 22px; }
-/* Liquid Glass dropdown (Age) */
-.field-label { font-size: 14px; font-weight: 400; color: rgb(255 255 255 / 0.75); }
-.dropdown { position: relative; }
-.dropdown-trigger { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; cursor: pointer; }
-.dropdown-trigger svg { flex: none; width: 20px; height: 20px; transition: transform 0.2s ease; }
-.dropdown-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
-.dropdown-value.is-placeholder { color: rgb(255 255 255 / 0.4); }
-.dropdown-list {
-  position: fixed;          /* placed by report.js against the screen */
-  z-index: 60;
-  margin: 0;
-  padding: 6px;
-  list-style: none;
-  border-radius: 24px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.02) 45%, rgb(255 255 255 / 0.06)),
-    rgb(4 20 36 / 0.88);
-  -webkit-backdrop-filter: blur(28px) saturate(1.5);
-  backdrop-filter: blur(28px) saturate(1.5);
-  box-shadow:
-    inset 1px 1px 0 rgb(255 255 255 / 0.35),
-    inset -1px -1px 0 rgb(255 255 255 / 0.08),
-    0 20px 44px rgb(0 0 0 / 0.5);
-  outline: none;
-  transform-origin: top center;
-  animation: dropdown-in 0.22s ease-out both;
-}
-.dropdown-list.up { transform-origin: bottom center; }
-@keyframes dropdown-in { from { opacity: 0; transform: translateY(-6px) scale(0.98); filter: blur(6px); } }
-.dropdown-list.up { animation-name: dropdown-in-up; }
-@keyframes dropdown-in-up { from { opacity: 0; transform: translateY(6px) scale(0.98); filter: blur(6px); } }
-.dropdown-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 44px;
-  padding: 0 14px 0 16px;
-  border-radius: 999px;
-  font-weight: 400;
-  cursor: pointer;
-}
-.dropdown-list li .check { width: 20px; height: 20px; visibility: hidden; }
-.dropdown-list li[aria-selected="true"] { font-weight: 500; }
-.dropdown-list li[aria-selected="true"] .check { visibility: visible; }
-.dropdown-list li.is-active { background: rgb(255 255 255 / 0.14); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); }
-.dropdown-trigger[aria-invalid="true"] { outline: 2px solid #ff4d4f; outline-offset: 3px; }
 html.modal-open { overflow: hidden; }
 .details [hidden] { display: none; }
 
@@ -619,14 +544,14 @@ html.modal-open { overflow: hidden; }
 .bi-in .bi-word,
 .bi-in .bi-item,
 .bi-block.bi-in,
-.stat-meta.meta-wait.meta-in { opacity: 1; transform: none; filter: blur(0); }
+/* End states use filter: none (not blur(0)): Safari keeps a filtered element as a cached,
+   low-resolution layer, which made logos inside the moving marquee look soft. */
+.stat-meta.meta-wait.meta-in { opacity: 1; transform: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .ribbon video { transition: none; }
   .cursor-dot { transition: opacity 0.2s ease; }
   .partner-logos a img { transition: none; }
-  .dropdown-list { animation: none; }
-  .dropdown-trigger svg { transition: none; }
   .details[open] .details-panel { animation: none; }
   .dock.is-floating { transition: none; }
   .strip { overflow-x: auto; }

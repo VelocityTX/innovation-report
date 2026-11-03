@@ -3,8 +3,9 @@
 //    screen, over its matching static poster. Reduced motion / Data Saver: posters only.
 //  - One Play/Pause control drives every animation on the page (videos + logo marquees).
 //  - Logo strips become a slow marquee only when they don't fit their container.
-//  - Download forms: soft gate. A valid email immediately unlocks the report; email
-//    collection (Mailchimp) plugs into collect() later and never blocks the download.
+//  - Download forms: soft gate. First name, last name and a valid email start the download
+//    and open the confirmation modal; collection (Mailchimp) plugs into collect() later and
+//    never blocks the download.
 (function () {
   "use strict";
 
@@ -250,12 +251,17 @@
       var meta = el.closest(".stat").querySelector(".stat-meta");
       if (meta) meta.classList.add("meta-wait");
     });
+    // Each number starts as soon as it is on screen (half of the figure visible), once.
+    // Numbers that appear together (the desktop row) start 90ms apart.
     var statsIO = new IntersectionObserver(function (entries) {
-      if (!entries.some(function (e) { return e.isIntersecting; })) return;
-      statsIO.disconnect();
-      counters.forEach(function (el, i) { reveal(el, i * 90); });
-    }, { threshold: 0.35 });
-    statsIO.observe(document.querySelector(".stats"));
+      var k = 0;
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        statsIO.unobserve(e.target);
+        reveal(e.target, k++ * 90);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function (el) { statsIO.observe(el); });
     // Re-lock widths after web fonts settle (the first measurement may use a fallback).
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
       counters.forEach(function (el) {
@@ -269,19 +275,31 @@
   }
 
   /* ------------------------- Floating download ------------------------- */
-  // The closing field floats 16px above the bottom of the screen across the page and
+  // The closing email field floats 16px above the bottom of the screen across the page and
   // docks into its slot in the closing section once that slot reaches the same spot.
   // It stays hidden while the hero's own form is on screen, so two forms never show.
   var dock = document.querySelector("[data-dock]");
   var heroForm = document.querySelector(".hero [data-download]");
   if (dock) {
     var slot = dock.parentElement;
+    var footForm = dock.closest("form");
+    var nameRow = footForm.querySelector(".name-row");
     var heroFormVisible = true;
     var queued = false;
     var updateDock = function () {
       queued = false;
       var floatTop = window.innerHeight - 16 - dock.offsetHeight;
-      var docked = slot.getBoundingClientRect().top <= floatTop;
+      var box = slot.getBoundingClientRect();
+      // Dock as soon as the footer's name fields come up from the bottom edge, so the
+      // floating email never sits on top of them; it then scrolls in under them.
+      var docked = box.top <= floatTop || (nameRow && nameRow.getBoundingClientRect().top < window.innerHeight);
+      dock.style.setProperty("--dock-left", box.left + "px");
+      dock.style.setProperty("--dock-width", box.width + "px");
+      // Floating, it lives at the top level of the page: inside the footer (its own
+      // stacking context) backdrop-filter can't see the page behind it. The email input
+      // and button keep submitting the footer form through their form attribute.
+      var home = docked ? slot : document.body;
+      if (dock.parentElement !== home) home.appendChild(dock);
       dock.classList.toggle("is-floating", !docked);
       dock.classList.toggle("is-hidden", !docked && heroFormVisible);
       if (dock.classList.contains("is-hidden") && dock.contains(document.activeElement)) document.activeElement.blur();
@@ -295,6 +313,21 @@
     window.addEventListener("scroll", queueDock, { passive: true });
     window.addEventListener("resize", queueDock);
     updateDock();
+
+    // Only the email field floats. Tapping it (or tabbing into it) brings you down to the
+    // full form instead, with the cursor in the first empty field.
+    var goToForm = function (e) {
+      if (!dock.classList.contains("is-floating")) return;
+      if (e.type === "pointerdown") e.preventDefault();
+      var fields = [footForm.elements.firstName, footForm.elements.lastName, footForm.elements.email];
+      var target = fields.filter(function (i) { return !i.value.trim(); })[0] || fields[0];
+      target.focus({ preventScroll: true });
+      // Land with the slot 32px above the bottom of the screen, past the docking point.
+      var top = window.scrollY + slot.getBoundingClientRect().bottom - (window.innerHeight - 32);
+      window.scrollTo({ top: top, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    };
+    dock.addEventListener("pointerdown", goToForm);
+    dock.addEventListener("focusin", function (e) { if (e.target.matches("input, button")) goToForm(e); });
   }
 
   /* ------------------------- Download (soft gate) ------------------------ */
@@ -311,166 +344,42 @@
     a.href = REPORT_PDF; a.download = ""; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  /* Step 2: the details modal (Liquid Glass). Opens once a valid email is entered. */
+  /* The download modal (Liquid Glass): confirms the download that has just started. */
   var dialog = document.getElementById("details");
-  var detailsForm = document.getElementById("details-form");
-  var done = document.getElementById("details-done");
-  var detailsError = document.getElementById("details-error");
-  var pendingEmail = "";
   var returnFocus = null;
 
-  function openDetails(email, from) {
-    pendingEmail = email;
+  function openDone(firstName, from) {
     returnFocus = from;
-    detailsForm.hidden = false;
-    done.hidden = true;
-    detailsError.textContent = "";
-    [].slice.call(detailsForm.querySelectorAll("[aria-invalid]")).forEach(function (el) { el.removeAttribute("aria-invalid"); });
+    document.getElementById("details-done-text").textContent = REPORT_PDF
+      ? "Thanks, " + firstName + " — your download has started."
+      : "Thanks, " + firstName + " — the report download will start here once the PDF is connected.";
     root.classList.add("modal-open");
     if (dialog.showModal) dialog.showModal(); else dialog.setAttribute("open", "");
-    var first = detailsForm.querySelector("input[name=workplace]");
-    if (first) first.focus();
+    document.getElementById("details-done").focus();
   }
-  function closeDetails() {
+  function closeDone() {
     if (dialog.open && dialog.close) dialog.close(); else dialog.removeAttribute("open");
   }
   dialog.addEventListener("close", function () {
     root.classList.remove("modal-open");
     if (returnFocus) returnFocus.focus();
   });
-  [].slice.call(dialog.querySelectorAll("[data-close]")).forEach(function (b) { b.addEventListener("click", closeDetails); });
+  [].slice.call(dialog.querySelectorAll("[data-close]")).forEach(function (b) { b.addEventListener("click", closeDone); });
   // Click on the dimmed backdrop closes too.
-  dialog.addEventListener("click", function (e) { if (e.target === dialog) closeDetails(); });
+  dialog.addEventListener("click", function (e) { if (e.target === dialog) closeDone(); });
 
-  // Clear the red outline as soon as a field becomes valid.
-  detailsForm.addEventListener("input", function (e) {
-    var t = e.target;
-    if (t.name === "workplace") t.closest("fieldset").removeAttribute("aria-invalid");
-    else if (t.value && t.value.trim()) t.removeAttribute("aria-invalid");
-  });
-  detailsForm.addEventListener("change", function (e) {
-    if (e.target.name === "workplace") e.target.closest("fieldset").removeAttribute("aria-invalid");
-    else if (e.target.value) e.target.removeAttribute("aria-invalid");
-  });
-
-  detailsForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var f = detailsForm.elements;
-    var missing = [];
-    var workplace = detailsForm.querySelector("input[name=workplace]:checked");
-    var fieldset = detailsForm.querySelector("fieldset[data-required]");
-    if (!workplace) { fieldset.setAttribute("aria-invalid", "true"); missing.push({ el: f.workplace[0], label: "where you work" }); }
-    [["company", "company"], ["age", "age"], ["firstName", "first name"], ["lastName", "last name"]].forEach(function (k) {
-      var el = f[k[0]];
-      // Age is a custom dropdown: its value lives in a hidden input; outline and focus the button.
-      var target = k[0] === "age" ? document.getElementById("d-age-btn") : el;
-      if (!el.value || !el.value.trim()) { target.setAttribute("aria-invalid", "true"); missing.push({ el: target, label: k[1] }); }
-    });
-    if (missing.length) {
-      var labels = missing.map(function (m) { return m.label; });
-      var list = labels.length > 1 ? labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1] : labels[0];
-      detailsError.textContent = "Please fill in " + list + ".";
-      missing[0].el.focus();
-      return;
-    }
-    var data = {
-      email: pendingEmail,
-      workplace: workplace.value,
-      company: f.company.value.trim(),
-      age: f.age.value,
-      firstName: f.firstName.value.trim(),
-      lastName: f.lastName.value.trim()
-    };
-    collect(data);
-    startDownload();   // never waits on collection
-    document.getElementById("details-done-text").textContent = REPORT_PDF
-      ? "Thanks, " + data.firstName + " — your download has started."
-      : "Thanks, " + data.firstName + " — the report download will start here once the PDF is connected.";
-    detailsForm.hidden = true;
-    done.hidden = false;
-    done.focus();
-  });
-
-  /* Liquid Glass dropdown (listbox pattern): replaces the native <select> for Age. */
-  [].slice.call(document.querySelectorAll("[data-dropdown]")).forEach(function (dd) {
-    var trigger = dd.querySelector(".dropdown-trigger");
-    var valueEl = dd.querySelector(".dropdown-value");
-    var list = dd.querySelector(".dropdown-list");
-    var hidden = dd.querySelector("input[type=hidden]");
-    var options = [].slice.call(list.querySelectorAll("[role=option]"));
-    var active = -1;
-
-    function setActive(i) {
-      active = Math.max(0, Math.min(options.length - 1, i));
-      options.forEach(function (o, k) { o.classList.toggle("is-active", k === active); });
-      list.setAttribute("aria-activedescendant", options[active].id);
-      options[active].scrollIntoView({ block: "nearest" });
-    }
-    // Positioned against the screen (not the modal) so the panel's scroll area can't clip it:
-    // below the button when there's room, otherwise above.
-    function place() {
-      var r = trigger.getBoundingClientRect();
-      var h = list.offsetHeight;
-      var below = window.innerHeight - r.bottom;
-      var up = below < h + 16 && r.top > below;
-      list.classList.toggle("up", up);
-      list.style.left = r.left + "px";
-      list.style.width = r.width + "px";
-      list.style.top = (up ? r.top - 8 - h : r.bottom + 8) + "px";
-    }
-    function open() {
-      if (!list.hidden) return;
-      list.hidden = false;
-      place();
-      trigger.setAttribute("aria-expanded", "true");
-      var sel = options.findIndex(function (o) { return o.getAttribute("aria-selected") === "true"; });
-      setActive(sel >= 0 ? sel : 0);
-      list.focus();
-    }
-    function close(refocus) {
-      if (list.hidden) return;
-      list.hidden = true;
-      trigger.setAttribute("aria-expanded", "false");
-      if (refocus) trigger.focus();
-    }
-    function choose(i) {
-      options.forEach(function (o, k) { o.setAttribute("aria-selected", k === i ? "true" : "false"); });
-      hidden.value = options[i].textContent.trim();
-      valueEl.textContent = hidden.value;
-      valueEl.classList.remove("is-placeholder");
-      trigger.removeAttribute("aria-invalid");
-      close(true);
-    }
-
-    trigger.addEventListener("click", function () { if (list.hidden) open(); else close(true); });
-    trigger.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); open(); }
-    });
-    list.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
-      else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
-      else if (e.key === "Home") { e.preventDefault(); setActive(0); }
-      else if (e.key === "End") { e.preventDefault(); setActive(options.length - 1); }
-      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(active); }
-      else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(true); }  // don't close the modal
-      else if (e.key === "Tab") { close(false); }
-    });
-    options.forEach(function (o, i) {
-      o.addEventListener("mousemove", function () { if (active !== i) setActive(i); });
-      o.addEventListener("click", function () { choose(i); });
-    });
-    document.addEventListener("pointerdown", function (e) { if (!dd.contains(e.target)) close(false); });
-    window.addEventListener("resize", function () { if (!list.hidden) place(); });
-    var scroller = dd.closest(".details-panel");
-    if (scroller) scroller.addEventListener("scroll", function () { if (!list.hidden) place(); }, { passive: true });
-    // The dialog's own Escape/cancel shouldn't fire while the list is open.
-    if (dialog) dialog.addEventListener("cancel", function (e) { if (!list.hidden) { e.preventDefault(); close(true); } });
-  });
-
-  /* Step 1: business email (hero, footer and the floating field). */
+  /* The download form (hero, footer and the floating copy): first name, last name, business email. */
   [].slice.call(document.querySelectorAll("[data-download]")).forEach(function (form) {
-    var input = form.querySelector("input[type=email]");
-    var msg = form.querySelector(".download-msg");
+    // form.elements, not querySelector: the footer's email field may be floating outside the form.
+    var first = form.elements.firstName;
+    var last = form.elements.lastName;
+    var email = form.elements.email;
+    var msg = document.getElementById(email.getAttribute("aria-describedby"));
+
+    function valid(input) {
+      var v = input.value.trim();
+      return input === email ? EMAIL.test(v) : v.length > 0;
+    }
 
     // Errors show as a red outline on the field; the text is announced for screen readers.
     function sayError(text) {
@@ -478,22 +387,38 @@
       msg.textContent = text;
     }
     function clearError() {
-      input.removeAttribute("aria-invalid");
       msg.classList.remove("is-error");
       msg.textContent = "";
     }
 
-    input.addEventListener("input", function () {
-      if (input.getAttribute("aria-invalid") === "true" && EMAIL.test(input.value.trim())) clearError();
+    // Clear each red outline as soon as that field becomes valid.
+    [first, last, email].forEach(function (input) {
+      input.addEventListener("input", function () {
+        if (input.getAttribute("aria-invalid") === "true" && valid(input)) input.removeAttribute("aria-invalid");
+        if (![first, last, email].some(function (i) { return i.getAttribute("aria-invalid") === "true"; })) clearError();
+      });
     });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var email = input.value.trim();
-      if (!email) { input.setAttribute("aria-invalid", "true"); sayError("Enter your business email to download the report."); input.focus(); return; }
-      if (!EMAIL.test(email)) { input.setAttribute("aria-invalid", "true"); sayError("Enter a valid email address, like name@company.com."); input.focus(); return; }
+      var missing = [];
+      [[first, "first name"], [last, "last name"], [email, "business email"]].forEach(function (k) {
+        if (valid(k[0])) k[0].removeAttribute("aria-invalid");
+        else { k[0].setAttribute("aria-invalid", "true"); missing.push(k); }
+      });
+      if (missing.length) {
+        var bad = missing.length === 1 && missing[0][0] === email && email.value.trim();
+        var labels = missing.map(function (m) { return m[1]; });
+        var list = labels.length > 1 ? labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1] : labels[0];
+        sayError(bad ? "Enter a valid email address, like name@company.com." : "Please fill in your " + list + ".");
+        missing[0][0].focus();
+        return;
+      }
       clearError();
-      openDetails(email, input);
+      var data = { firstName: first.value.trim(), lastName: last.value.trim(), email: email.value.trim() };
+      collect(data);
+      startDownload();   // never waits on collection
+      openDone(data.firstName, email);
     });
   });
 })();

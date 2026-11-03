@@ -172,13 +172,25 @@
 
       <form class="download" data-download novalidate aria-labelledby="dl-hero-title">
         <p class="download-title trim" id="dl-hero-title">Download report</p>
-        <div class="field glass" data-glass>
+        <div class="download-fields">
+        <div class="name-row">
+          <div class="field glass" data-glass data-glass-radius="12">
+            <label class="sr-only" for="first-hero">First name</label>
+            <input id="first-hero" name="firstName" type="text" autocomplete="given-name" placeholder="First name" required aria-describedby="dl-hero-msg">
+          </div>
+          <div class="field glass" data-glass data-glass-radius="12">
+            <label class="sr-only" for="last-hero">Last name</label>
+            <input id="last-hero" name="lastName" type="text" autocomplete="family-name" placeholder="Last name" required aria-describedby="dl-hero-msg">
+          </div>
+        </div>
+        <div class="field glass" data-glass data-glass-radius="12">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#fff" d="M21 4.6875H3C2.85082 4.6875 2.70774 4.74676 2.60225 4.85225C2.49676 4.95774 2.4375 5.10082 2.4375 5.25V18C2.4375 18.3481 2.57578 18.6819 2.82192 18.9281C3.06806 19.1742 3.4019 19.3125 3.75 19.3125H20.25C20.5981 19.3125 20.9319 19.1742 21.1781 18.9281C21.4242 18.6819 21.5625 18.3481 21.5625 18V5.25C21.5625 5.10082 21.5032 4.95774 21.3977 4.85225C21.2923 4.74676 21.1492 4.6875 21 4.6875ZM12 12.7369L4.44562 5.8125H19.5544L12 12.7369ZM9.53156 12L3.5625 17.4713V6.52875L9.53156 12ZM10.3641 12.7631L11.625 13.9144C11.7287 14.0092 11.8641 14.0619 12.0047 14.0619C12.1452 14.0619 12.2807 14.0092 12.3844 13.9144L13.6406 12.7631L19.5544 18.1875H4.44656L10.3641 12.7631ZM14.4684 12L20.4375 6.52875V17.4713L14.4684 12Z"/></svg>
           <label class="sr-only" for="email-hero">Business email</label>
           <input id="email-hero" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Business email" required aria-describedby="dl-hero-msg">
           <button type="submit" aria-label="Download report">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.6475 12.3981L13.8975 19.1481C13.7909 19.2475 13.6498 19.3016 13.5041 19.299C13.3584 19.2964 13.2193 19.2374 13.1163 19.1343C13.0132 19.0313 12.9542 18.8922 12.9516 18.7465C12.949 18.6008 13.0031 18.4597 13.1025 18.3531L18.8916 12.5631H3.75C3.60082 12.5631 3.45774 12.5039 3.35225 12.3984C3.24676 12.2929 3.1875 12.1498 3.1875 12.0006C3.1875 11.8514 3.24676 11.7084 3.35225 11.6029C3.45774 11.4974 3.60082 11.4381 3.75 11.4381H18.8916L13.1025 5.64812C13.0031 5.54149 12.949 5.40045 12.9516 5.25473C12.9542 5.109 13.0132 4.96996 13.1163 4.8669C13.2193 4.76384 13.3584 4.70481 13.5041 4.70224C13.6498 4.69966 13.7909 4.75376 13.8975 4.85312L20.6475 11.6031C20.7528 11.7086 20.812 11.8516 20.812 12.0006C20.812 12.1497 20.7528 12.2926 20.6475 12.3981Z"/></svg>
           </button>
+        </div>
         </div>
         <p class="download-msg" id="dl-hero-msg" role="status" aria-live="polite"></p>
       </form>
@@ -197,10 +209,10 @@
           <div class="logos-strip">
             <div class="strip partner-logos" data-strip data-blur-in-items>
               <ul class="strip-track" role="list">
-                <li><a href="https://www.geekdom.com" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/geekdom.svg" alt="Geekdom" style="--h: 28.5px; --r: 0.1036" width="76" height="29"></a></li>
-                <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/port-san-antonio.svg" alt="Port San Antonio" style="--h: 35.9px; --r: 0.1305" width="82" height="36"></a></li>
-                <li><a href="https://satechbloc.com/" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/techbloc.svg" alt="Tech Bloc" style="--h: 35.3px; --r: 0.1284" width="56" height="36"></a></li>
-                <li><a href="https://velocitytx.org" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/velocitytx.svg" alt="VelocityTX" style="--h: 41.3px; --r: 0.1502" width="61" height="42"></a></li>
+                <li><a href="https://www.geekdom.com" target="_blank" rel="noopener" data-cursor><img src="/report/assets/logos/geekdom.svg" alt="Geekdom" style="--h: 28.5px; --r: 0.1036" width="76" height="29"></a></li>
+                <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener" data-cursor><img src="/report/assets/logos/port-san-antonio.svg" alt="Port San Antonio" style="--h: 35.9px; --r: 0.1305" width="82" height="36"></a></li>
+                <li><a href="https://satechbloc.com/" target="_blank" rel="noopener" data-cursor><img src="/report/assets/logos/techbloc.svg" alt="Tech Bloc" style="--h: 35.3px; --r: 0.1284" width="56" height="36"></a></li>
+                <li><a href="https://velocitytx.org" target="_blank" rel="noopener" data-cursor><img src="/report/assets/logos/velocitytx.svg" alt="VelocityTX" style="--h: 41.3px; --r: 0.1502" width="61" height="42"></a></li>
               </ul>
             </div>
           </div>
@@ -282,7 +294,7 @@
           <div class="badge" data-blur-in-block><img src="/report/assets/greater-satx.svg" alt="greater:SATX" width="88" height="44"></div>
           <div class="text">
             <h2 id="greater-title" data-blur-in>Supporting SATX Innovation</h2>
-            <p class="prose trim" data-blur-in-block>greater:SATX is a public-private economic development organization supporting San Antonio’s economic growth. As the study’s data partner, it validates the methodology against national best practices and independently verifies the underlying data.</p>
+            <p class="prose trim" data-blur-in-block>greater:SATX is a public-private economic development organization supporting San Antonio’s economic growth. As the Consortium’s data partner, it validates the methodology against national best practices and independently verifies the underlying data.</p>
           </div>
         </div>
       </div>
@@ -294,15 +306,15 @@
         <h2 id="sponsors-title" data-blur-in>Thank you to our sponsors</h2>
         <div class="strip sponsor-logos" data-strip data-blur-in-items>
           <ul class="strip-track" role="list">
-            <li><img src="/report/assets/sponsors/aprio.png" alt="Aprio" style="--h: 46px" width="104" height="46"></li>
-            <li><img src="/report/assets/sponsors/frost.png" alt="Frost" style="--h: 46px" width="117" height="46"></li>
-            <li><img src="/report/assets/sponsors/whiting-turner.png" alt="Whiting-Turner" style="--h: 74px" width="101" height="74"></li>
-            <li><img src="/report/assets/sponsors/documation.png" alt="Documation" style="--h: 39px" width="136" height="39"></li>
-            <li><img src="/report/assets/sponsors/genesis.png" alt="Genesis Wealth Management" style="--h: 74px" width="102" height="74"></li>
-            <li><img src="/report/assets/sponsors/texas-partners-bank.png" alt="Texas Partners Bank" style="--h: 62px" width="132" height="62"></li>
-            <li><img src="/report/assets/sponsors/tia-group.png" alt="TIA Group" style="--h: 74px" width="103" height="74"></li>
-            <li><img src="/report/assets/sponsors/hancock-whitney.png" alt="Hancock Whitney Bank" style="--h: 74px" width="82" height="74"></li>
-            <li><img src="/report/assets/sponsors/greater-satx.svg" alt="greater:SATX" style="--h: 44px" width="88" height="44"></li>
+            <li><img src="/report/assets/sponsors/aprio.svg" alt="Aprio" style="--h: 57px" width="153" height="57"></li>
+            <li><img src="/report/assets/sponsors/texas-partners-bank.svg" alt="Texas Partners Bank" style="--h: 74px" width="158" height="74"></li>
+            <li><img src="/report/assets/sponsors/frost.svg" alt="Frost" style="--h: 57px" width="170" height="57"></li>
+            <li><img src="/report/assets/sponsors/whiting-turner.svg" alt="Whiting-Turner" style="--h: 78px" width="105" height="78"></li>
+            <li><img src="/report/assets/sponsors/documation.svg" alt="Documation" style="--h: 53px" width="187" height="53"></li>
+            <li><img src="/report/assets/sponsors/irys.svg" alt="Irys" style="--h: 60px" width="197" height="60"></li>
+            <li><img src="/report/assets/sponsors/genesis-wealth.png" alt="Genesis Wealth Management" style="--h: 71px" width="98" height="71"></li>
+            <li><img src="/report/assets/sponsors/hancock-whitney.svg" alt="Hancock Whitney Bank" style="--h: 79px" width="87" height="79"></li>
+            <li><img src="/report/assets/sponsors/tia-group.svg" alt="TIA Group" style="--h: 63px" width="96" height="63"></li>
           </ul>
         </div>
       </div>
@@ -324,19 +336,37 @@
       <video muted playsinline loop preload="none" tabindex="-1" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
     </div>
     <div class="wrap">
-      <form class="download" data-download novalidate aria-labelledby="dl-foot-title">
+      <h2 class="title closing-title" data-blur-in>
+        <span class="year">2026</span>
+        <span>San Antonio</span>
+        <span>State of</span>
+        <span>Innovation</span>
+      </h2>
+      <form class="download" id="dl-foot-form" data-download novalidate aria-labelledby="dl-foot-title">
         <p class="download-title trim" id="dl-foot-title">Download report</p>
+        <div class="download-fields">
+        <div class="name-row">
+          <div class="field glass" data-glass data-glass-radius="12">
+            <label class="sr-only" for="first-foot">First name</label>
+            <input id="first-foot" name="firstName" type="text" autocomplete="given-name" placeholder="First name" required aria-describedby="dl-foot-msg">
+          </div>
+          <div class="field glass" data-glass data-glass-radius="12">
+            <label class="sr-only" for="last-foot">Last name</label>
+            <input id="last-foot" name="lastName" type="text" autocomplete="family-name" placeholder="Last name" required aria-describedby="dl-foot-msg">
+          </div>
+        </div>
         <div class="dock-slot">
         <div class="dock" data-dock>
-        <div class="field glass" data-glass>
+        <div class="field glass" data-glass data-glass-radius="12">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#fff" d="M21 4.6875H3C2.85082 4.6875 2.70774 4.74676 2.60225 4.85225C2.49676 4.95774 2.4375 5.10082 2.4375 5.25V18C2.4375 18.3481 2.57578 18.6819 2.82192 18.9281C3.06806 19.1742 3.4019 19.3125 3.75 19.3125H20.25C20.5981 19.3125 20.9319 19.1742 21.1781 18.9281C21.4242 18.6819 21.5625 18.3481 21.5625 18V5.25C21.5625 5.10082 21.5032 4.95774 21.3977 4.85225C21.2923 4.74676 21.1492 4.6875 21 4.6875ZM12 12.7369L4.44562 5.8125H19.5544L12 12.7369ZM9.53156 12L3.5625 17.4713V6.52875L9.53156 12ZM10.3641 12.7631L11.625 13.9144C11.7287 14.0092 11.8641 14.0619 12.0047 14.0619C12.1452 14.0619 12.2807 14.0092 12.3844 13.9144L13.6406 12.7631L19.5544 18.1875H4.44656L10.3641 12.7631ZM14.4684 12L20.4375 6.52875V17.4713L14.4684 12Z"/></svg>
           <label class="sr-only" for="email-foot">Business email</label>
-          <input id="email-foot" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Business email" required aria-describedby="dl-foot-msg">
-          <button type="submit" aria-label="Download report">
+          <input id="email-foot" form="dl-foot-form" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Business email" required aria-describedby="dl-foot-msg">
+          <button type="submit" form="dl-foot-form" aria-label="Download report">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.6475 12.3981L13.8975 19.1481C13.7909 19.2475 13.6498 19.3016 13.5041 19.299C13.3584 19.2964 13.2193 19.2374 13.1163 19.1343C13.0132 19.0313 12.9542 18.8922 12.9516 18.7465C12.949 18.6008 13.0031 18.4597 13.1025 18.3531L18.8916 12.5631H3.75C3.60082 12.5631 3.45774 12.5039 3.35225 12.3984C3.24676 12.2929 3.1875 12.1498 3.1875 12.0006C3.1875 11.8514 3.24676 11.7084 3.35225 11.6029C3.45774 11.4974 3.60082 11.4381 3.75 11.4381H18.8916L13.1025 5.64812C13.0031 5.54149 12.949 5.40045 12.9516 5.25473C12.9542 5.109 13.0132 4.96996 13.1163 4.8669C13.2193 4.76384 13.3584 4.70481 13.5041 4.70224C13.6498 4.69966 13.7909 4.75376 13.8975 4.85312L20.6475 11.6031C20.7528 11.7086 20.812 11.8516 20.812 12.0006C20.812 12.1497 20.7528 12.2926 20.6475 12.3981Z"/></svg>
           </button>
         </div>
         <p class="download-msg" id="dl-foot-msg" role="status" aria-live="polite"></p>
+        </div>
         </div>
         </div>
       </form>
@@ -345,64 +375,10 @@
 
   <div class="cursor-dot" aria-hidden="true"></div>
 
-  <!-- ===================== Details modal (after the email step) ===================== -->
-  <dialog class="details" id="details" aria-labelledby="details-title">
+  <!-- ===================== Download modal (after the form) ===================== -->
+  <dialog class="details" id="details" aria-labelledby="details-done-title" aria-describedby="details-done-text">
     <div class="details-panel glass" data-glass="0.55" data-glass-radius="28">
-      <form class="details-form" id="details-form" novalidate>
-        <h2 class="details-title" id="details-title">Almost there</h2>
-
-        <fieldset class="details-field" data-required>
-          <legend>Where do you work?</legend>
-          <div class="segmented">
-            <label><input type="radio" name="workplace" value="Remote"><span>Remote</span></label>
-            <label><input type="radio" name="workplace" value="In office"><span>In office</span></label>
-          </div>
-        </fieldset>
-
-        <div class="details-field">
-          <label for="d-company">Company</label>
-          <input class="details-input" id="d-company" name="company" type="text" autocomplete="organization" required>
-        </div>
-
-        <div class="details-field">
-          <span class="field-label" id="age-label">Age</span>
-          <div class="dropdown" data-dropdown>
-            <input type="hidden" name="age" id="d-age">
-            <button type="button" class="details-input dropdown-trigger" id="d-age-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="age-list" aria-labelledby="age-label d-age-btn">
-              <span class="dropdown-value is-placeholder">Select</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <ul class="dropdown-list" id="age-list" role="listbox" tabindex="-1" aria-labelledby="age-label" hidden>
-              <li role="option" id="age-opt-0" aria-selected="false">Under 25<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-1" aria-selected="false">25–34<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-2" aria-selected="false">35–44<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-3" aria-selected="false">45–54<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-4" aria-selected="false">55–64<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-5" aria-selected="false">65 or older<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-              <li role="option" id="age-opt-6" aria-selected="false">Prefer not to say<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="details-row">
-          <div class="details-field">
-            <label for="d-first">First name</label>
-            <input class="details-input" id="d-first" name="firstName" type="text" autocomplete="given-name" required>
-          </div>
-          <div class="details-field">
-            <label for="d-last">Last name</label>
-            <input class="details-input" id="d-last" name="lastName" type="text" autocomplete="family-name" required>
-          </div>
-        </div>
-
-        <p class="sr-only" id="details-error" role="status" aria-live="polite"></p>
-        <button class="details-submit" type="submit">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4.8525 10.8975C4.75314 10.7909 4.69905 10.6498 4.70162 10.5041C4.70419 10.3584 4.76322 10.2193 4.86628 10.1163C4.96934 10.0132 5.10838 9.95419 5.25411 9.95162C5.39983 9.94905 5.54087 10.0031 5.6475 10.1025L11.4375 15.8916V3C11.4375 2.85082 11.4968 2.70774 11.6023 2.60225C11.7077 2.49676 11.8508 2.4375 12 2.4375C12.1492 2.4375 12.2923 2.49676 12.3977 2.60225C12.5032 2.70774 12.5625 2.85082 12.5625 3V15.8916L18.3525 10.1025C18.4591 10.0031 18.6002 9.94905 18.7459 9.95162C18.8916 9.95419 19.0307 10.0132 19.1337 10.1163C19.2368 10.2193 19.2958 10.3584 19.2984 10.5041C19.301 10.6498 19.2469 10.7909 19.1475 10.8975L12.3975 17.6475C12.292 17.7528 12.1491 17.812 12 17.812C11.8509 17.812 11.708 17.7528 11.6025 17.6475L4.8525 10.8975ZM20.25 19.6875H3.75C3.60082 19.6875 3.45774 19.7468 3.35225 19.8523C3.24676 19.9577 3.1875 20.1008 3.1875 20.25C3.1875 20.3992 3.24676 20.5423 3.35225 20.6477C3.45774 20.7532 3.60082 20.8125 3.75 20.8125H20.25C20.3992 20.8125 20.5423 20.7532 20.6477 20.6477C20.7532 20.5423 20.8125 20.3992 20.8125 20.25C20.8125 20.1008 20.7532 19.9577 20.6477 19.8523C20.5423 19.7468 20.3992 19.6875 20.25 19.6875Z"/></svg>
-          <span>Download report</span>
-        </button>
-      </form>
-
-      <div class="details-done" id="details-done" hidden tabindex="-1">
+      <div class="details-done" id="details-done" tabindex="-1">
         <h2 class="details-title" id="details-done-title">Thank you</h2>
         <p class="details-sub" id="details-done-text"></p>
         <button class="details-submit" type="button" data-close><span>Done</span></button>
