@@ -27,7 +27,7 @@
 
   /* 402px → 1728px scales: value = intercept + slope·vw */
   --gutter: clamp(16px, 1.45px + 3.62vw, 64px);
-  --section-y: clamp(64px, 34.9px + 7.24vw, 160px);
+  --section-y: 120px;
   --title: clamp(40px, 23.4px + 5.128vw, 104px);
   --h2: clamp(28px, 24.7px + 1.81vw, 56px);
   --body: clamp(16px, 15.4px + 0.151vw, 18px);
@@ -256,14 +256,15 @@ button, input { font: inherit; color: inherit; }
 
 /* ---------- Quote ---------- */
 .quote { background: var(--ink-quote); }
-.quote .wrap > * + * { margin-top: 24px; }
+/* Mobile: 32px between a section headline and its body copy. */
+.quote figure { margin-top: 32px; }
 .quote blockquote { margin: 0; }
-.quote blockquote .prose { font-size: clamp(16px, 13.6px + 0.6vw, 24px); }
+.quote blockquote .prose { margin-top: 0; font-size: clamp(16px, 13.6px + 0.6vw, 24px); }
 .quote h2 > span:not(.sr-only) { display: block; }
 .quote figcaption { margin-top: 24px; }
 
 /* ---------- Inside the Report ---------- */
-.inside .intro { margin-top: 24px; color: rgb(255 255 255 / 0.75); }
+.inside .intro { margin-top: 32px; color: rgb(255 255 255 / 0.75); }
 .stats {
   list-style: none;
   margin: 24px 0 0;
@@ -317,7 +318,7 @@ button, input { font: inherit; color: inherit; }
 }
 .greater .badge img { width: 52.7%; height: auto; }
 .greater h2 { margin-top: 24px; }
-.greater .prose { margin-top: 24px; color: rgb(255 255 255 / 0.75); }
+.greater .prose { margin-top: 32px; color: rgb(255 255 255 / 0.75); }
 
 /* ---------- Sponsors ---------- */
 .sponsors .strip { margin-top: 44px; }
@@ -373,6 +374,7 @@ button, input { font: inherit; color: inherit; }
   .greater .split > .badge { grid-column: 1 / span 4; margin: 0; }
   .greater .split > .text { grid-column: 6 / span 6; }
   .greater h2 { margin-top: 0; }
+  .greater .prose { margin-top: 24px; }
 
   .prose, .subtitle, .stat-desc { line-height: 1.25; }
 }
@@ -400,7 +402,8 @@ button, input { font: inherit; color: inherit; }
 .blur-in-pending [data-blur-in-items] { visibility: hidden; }
 .bi-word,
 .bi-block,
-.bi-item {
+.bi-item,
+.stat-meta.meta-wait {
   opacity: 0;
   transform: translateY(12px);
   filter: blur(10px);
@@ -409,7 +412,8 @@ button, input { font: inherit; color: inherit; }
 .bi-word { display: inline-block; }
 .bi-in .bi-word,
 .bi-in .bi-item,
-.bi-block.bi-in { opacity: 1; transform: none; filter: blur(0); }
+.bi-block.bi-in,
+.stat-meta.meta-wait.meta-in { opacity: 1; transform: none; filter: blur(0); }
 
 @media (prefers-reduced-motion: reduce) {
   .ribbon video { transition: none; }

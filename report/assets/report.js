@@ -166,7 +166,7 @@
   // in the low digits, landing exactly on the real figure. Screen readers only ever
   // get the final value (the animated text is aria-hidden). Reduced motion: no effect.
   var counters = [].slice.call(document.querySelectorAll(".stat-count[data-to]"));
-  var DURATION = 820;
+  var DURATION = 1300;
 
   function formatNumber(el, n) {
     var d = +el.dataset.decimals || 0;
@@ -187,7 +187,13 @@
       var start = performance.now();
       (function tick() {
         var t = Math.min(1, (performance.now() - start) / DURATION);
-        if (t >= 1) { el.textContent = finalText; return; }
+        if (t >= 1) {
+          el.textContent = finalText;
+          // The comparison line blurs in once its number has landed.
+          var meta = el.closest(".stat").querySelector(".stat-meta");
+          if (meta) meta.classList.add("meta-in");
+          return;
+        }
         var eased = 1 - Math.pow(1 - t, 3);                       // decelerate toward the end
         var jitter = (Math.random() - 0.5) * span * 0.35 * Math.pow(1 - t, 2);
         var v = from + span * eased + jitter;
@@ -204,6 +210,8 @@
     counters.forEach(function (el) {
       el.style.minWidth = el.getBoundingClientRect().width + "px";
       el.textContent = formatNumber(el, parseFloat(el.dataset.from));
+      var meta = el.closest(".stat").querySelector(".stat-meta");
+      if (meta) meta.classList.add("meta-wait");
     });
     var statsIO = new IntersectionObserver(function (entries) {
       if (!entries.some(function (e) { return e.isIntersecting; })) return;
