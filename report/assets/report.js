@@ -250,12 +250,17 @@
       var meta = el.closest(".stat").querySelector(".stat-meta");
       if (meta) meta.classList.add("meta-wait");
     });
+    // Each number starts as soon as it is on screen (half of the figure visible), once.
+    // Numbers that appear together (the desktop row) start 90ms apart.
     var statsIO = new IntersectionObserver(function (entries) {
-      if (!entries.some(function (e) { return e.isIntersecting; })) return;
-      statsIO.disconnect();
-      counters.forEach(function (el, i) { reveal(el, i * 90); });
-    }, { threshold: 0.35 });
-    statsIO.observe(document.querySelector(".stats"));
+      var k = 0;
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        statsIO.unobserve(e.target);
+        reveal(e.target, k++ * 90);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function (el) { statsIO.observe(el); });
     // Re-lock widths after web fonts settle (the first measurement may use a fallback).
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
       counters.forEach(function (el) {
