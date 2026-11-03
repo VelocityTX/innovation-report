@@ -3,6 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <!-- Launch timing (single source of truth: /launch.js). Before the report launches,
+       "/" hands over to the countdown; "/?view=report" (or /report/) previews the report. -->
+  <script src="/launch.js"></script>
+  <script>
+    (function () {
+      var L = window.SOILaunch;
+      var preview = /(^|[?&])view=report(&|$)/.test(location.search);
+      if (L && !L.launched() && !preview) location.replace("/countdown/" + L.carry());
+    })();
+  </script>
   <title>San Antonio &amp; The State of Innovation 2026</title>
   <meta name="description" content="Join San Antonio &amp; The State of Innovation on November 4 at Texas Public Radio for the State of Innovation Report and a look at San Antonio’s innovation economy.">
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -87,11 +97,10 @@
     }
   }
   </script>
-  <link rel="preload" href="assets/fonts/ABCDiatype-Light.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/ABCDiatype-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/ABCDiatype-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/ABCDiatype-Light.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/ABCDiatype-Thin.woff2" as="font" type="font/woff2" crossorigin>
   <script>
-    // The CTA starts in its pre-WebGL glass state when WebGL is likely to work.
-    // assets/glass.js upgrades it; if that never happens the plain pill is restored.
     (function () {
       var root = document.documentElement;
       try {
@@ -102,400 +111,311 @@
       } catch (e) {}
     })();
   </script>
-  <style>
-    @font-face {
-      font-family: "ABC Diatype";
-      src: url("assets/fonts/ABCDiatype-Light.woff2") format("woff2");
-      font-weight: 300;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "ABC Diatype";
-      src: url("assets/fonts/ABCDiatype-Medium.woff2") format("woff2");
-      font-weight: 500;
-      font-display: swap;
-    }
-
-    /*
-      Figma trims text boxes to cap height. Diatype's cap height (0.70em) sits
-      centred in the line box, so trimming a line of line-height L means pulling
-      (L - 0.70) / 2 em off the top and bottom.
-    */
-    :root {
-      --white-50: rgb(255 255 255 / 0.5);
-      --white-88: rgb(255 255 255 / 0.88);
-      --trim-99: -0.145em;   /* line-height 99% */
-      --trim-97: -0.135em;   /* line-height 97% */
-      --trim-137: -0.335em;  /* line-height 137% */
-      --glass-tint: rgb(1 122 219 / 0.3);
-    }
-    * { box-sizing: border-box; }
-    html { background: #000; }
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: "ABC Diatype", "Helvetica Neue", Arial, sans-serif;
-      font-weight: 300;
-      font-size: 16px;
-      line-height: 0.99;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    a { color: inherit; }
-    :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-    .visually-hidden {
-      position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
-      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-    }
-
-    /* ---------- Page frame (desktop composition: MacBook Pro 16" 1728×1117) ---------- */
-    .page {
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-      min-height: 100vh;
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 16px;
-    }
-
-    /*
-      Ribbon artwork. The static poster and the video share one box and one
-      object-fit/object-position, so swapping between them never moves the art.
-      Desktop: full width, 16:9, anchored to the bottom (Figma 0,145 1728×972).
-    */
-    .ribbon {
-      position: absolute;
-      z-index: -1;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      aspect-ratio: 16 / 9;
-      pointer-events: none;
-    }
-    .ribbon img,
-    .ribbon video {
-      position: absolute;
-      inset: 0;
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 50% 100%;
-    }
-    .ribbon video { opacity: 0; transition: opacity 0.6s ease; }
-    .ribbon video.is-visible { opacity: 1; }
-
-    /* Presented by */
-    .partners {
-      margin-top: 64px;
-      width: 370px;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .partners p { margin: var(--trim-99) 0; color: var(--white-50); }
-    .logos {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      gap: 23.45px;
-      height: 41.27px;
-    }
-    .logos a { display: block; }
-    .logos img { display: block; }
-
-    main {
-      --num: clamp(64px, min(7.407vw, 14svh), 128px);  /* countdown numeral size */
-      flex: 1 0 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    /* Vertical rhythm. Above/below the countdown the free space splits 156:130 as in
-       Figma; the bottom gap follows the ribbon (334px of 1728 = 19.35vw) so the CTA
-       keeps its place just above the ribbon, but gives way on short screens. */
-    .space-top { flex: 156 1 0; min-height: 24px; }
-    .space-mid { flex: 130 1 0; min-height: 32px; }
-    /* 436.3px = everything else in the column at its minimum spacing; the numerals'
-       trimmed height is 0.9125 × --num. */
-    .space-end {
-      flex: 0 0 auto;
-      height: max(64px, min(19.35vw, 100svh - 436.3px - 0.9125 * var(--num)));
-    }
-
-    /* Countdown */
-    .countdown-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 48px;
-    }
-    .countdown {
-      display: flex;
-      gap: 0.25em;
-      margin: 0;
-      font-size: var(--num);
-      font-weight: 500;
-    }
-    .unit {
-      width: 1.203em;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.125em;
-    }
-    .unit-label {
-      margin: var(--trim-99) 0;
-      font-size: 0.125em;
-      line-height: 0.99;
-      text-transform: uppercase;
-      color: var(--white-50);
-    }
-    .unit-value {
-      margin: var(--trim-97) 0;
-      line-height: 0.97;
-      color: var(--white-88);
-      font-variant-numeric: tabular-nums lining-nums;
-      font-feature-settings: "tnum" 1, "lnum" 1;
-    }
-    .when {
-      margin: var(--trim-137) 0;
-      font-weight: 500;
-      line-height: 1.37;
-      text-align: center;
-      text-transform: uppercase;
-      color: var(--white-50);
-    }
-
-    /* Intro + CTA */
-    .intro-group {
-      width: 370px;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 32px;
-    }
-    .intro {
-      margin: var(--trim-99) 0;
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 0.99;
-      text-align: center;
-    }
-    .intro p,
-    .intro h1 { margin: 0; font: inherit; }
-    .intro p + p,
-    .intro p + h1 { margin-top: 0.99em; }
-
-    .cta {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 48px;
-      border-radius: 999px;
-      font-weight: 500;
-      text-decoration: none;
-      /* Fallback when Liquid Glass can't run: a translucent black pill. */
-      background: rgb(0 0 0 / 0.55);
-      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
-    }
-    .glass-pending .cta { background: var(--glass-tint); box-shadow: none; }
-    .cta.is-glass { background: transparent; box-shadow: none; }
-    .cta canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    .cta span { position: relative; margin: var(--trim-99) 0; line-height: 0.99; }
-
-    /* Background animation control */
-    .motion-toggle {
-      position: absolute;
-      z-index: 2;
-      right: 24px;
-      bottom: 24px;
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      color: #fff;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      /* Same glass language as the CTA (assets/glass.js). Fallback: translucent black. */
-      background: rgb(0 0 0 / 0.55);
-      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
-    }
-    /* Pre-WebGL state: the toggle's slightly deeper lens (see glass.js) over the tint. */
-    .glass-pending .motion-toggle { background: rgb(1 98 175 / 0.45); box-shadow: none; }
-    .motion-toggle.is-glass { background: transparent; box-shadow: none; }
-    .motion-toggle canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    .motion-toggle[hidden] { display: none; }
-    .motion-toggle svg { position: relative; width: 24px; height: 24px; display: block; }
-    .motion-toggle .icon-play { display: none; }
-    .motion-toggle[data-state="paused"] .icon-play { display: block; }
-    .motion-toggle[data-state="paused"] .icon-pause { display: none; }
-
-    /* ---------- Mobile composition (iPhone 16/17 Pro 402×874) ----------
-       Used for portrait screens and anything narrower than a tablet. */
-    @media (max-aspect-ratio: 1/1), (max-width: 767px) {
-      main {
-        --num: calc(min(100vw - 32px, 560px) * 0.173);
-        width: min(100%, 560px);
-        align-items: stretch;
-      }
-
-      /* Full-height ribbon cropped to Figma's mobile slice (portrait derivative). */
-      .ribbon { top: 0; aspect-ratio: auto; }
-
-      .space-top { flex: 1 1 0; min-height: 32px; }
-      .space-mid { flex: 0 0 clamp(48px, 11svh, 96px); min-height: 0; }
-      .space-end { height: 64px; }
-
-      .countdown-group { align-items: stretch; gap: 40px; }
-      .countdown {
-        justify-content: space-between;
-        gap: 16px;
-      }
-      .unit { gap: 0.125em; }
-
-      .intro-group { width: 100%; align-items: stretch; }
-      .intro { width: 279px; max-width: 100%; text-align: left; }
-
-      .motion-toggle { top: 16px; right: 16px; bottom: auto; width: 32px; height: 32px; }
-      .motion-toggle svg { width: 20px; height: 20px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .ribbon video { transition: none; }
-    }
-  </style>
+  <script>
+    // Blur In: hold the headings hidden until blur-in.js has split them (max 3s).
+    (function () {
+      try {
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+          var r = document.documentElement;
+          r.classList.add("blur-in-pending");
+          setTimeout(function () { r.classList.remove("blur-in-pending"); }, 3000);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="/report/assets/report.css">
 </head>
 <body>
-  <div class="page">
+
+  <!-- ===================== Hero ===================== -->
+  <header class="hero has-ribbon">
     <div class="ribbon" aria-hidden="true">
       <picture>
-        <source media="(max-aspect-ratio: 1/1), (max-width: 767px)" type="image/avif"
-                srcset="assets/media/ribbon-mobile-540.avif 540w, assets/media/ribbon-mobile-810.avif 810w"
-                sizes="(max-aspect-ratio: 9/16) 56.25vh, 100vw">
-        <source media="(max-aspect-ratio: 1/1), (max-width: 767px)" type="image/webp"
-                srcset="assets/media/ribbon-mobile-540.webp 540w, assets/media/ribbon-mobile-810.webp 810w"
-                sizes="(max-aspect-ratio: 9/16) 56.25vh, 100vw">
-        <source type="image/avif"
-                srcset="assets/media/ribbon-desktop-1280.avif 1280w, assets/media/ribbon-desktop-1920.avif 1920w, assets/media/ribbon-desktop-2560.avif 2560w"
-                sizes="100vw">
-        <source type="image/webp"
-                srcset="assets/media/ribbon-desktop-1280.webp 1280w, assets/media/ribbon-desktop-1920.webp 1920w, assets/media/ribbon-desktop-2560.webp 2560w"
-                sizes="100vw">
-        <img src="assets/media/ribbon-desktop-1920.webp" alt="" width="2560" height="1440" fetchpriority="high">
+        <source media="(max-aspect-ratio: 5/8)" type="image/avif"
+                srcset="/assets/media/ribbon-mobile-540.avif 540w, /assets/media/ribbon-mobile-810.avif 810w" sizes="100vw">
+        <source media="(max-aspect-ratio: 5/8)" type="image/webp"
+                srcset="/assets/media/ribbon-mobile-540.webp 540w, /assets/media/ribbon-mobile-810.webp 810w" sizes="100vw">
+        <source type="image/avif" srcset="/assets/media/ribbon-desktop-1280.avif 1280w, /assets/media/ribbon-desktop-1920.avif 1920w, /assets/media/ribbon-desktop-2560.avif 2560w" sizes="100vw">
+        <source type="image/webp" srcset="/assets/media/ribbon-desktop-1280.webp 1280w, /assets/media/ribbon-desktop-1920.webp 1920w, /assets/media/ribbon-desktop-2560.webp 2560w" sizes="100vw">
+        <img src="/assets/media/ribbon-desktop-1920.webp" alt="" width="2560" height="1440" fetchpriority="high">
       </picture>
-      <video muted playsinline loop preload="none" tabindex="-1"
-             disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
+      <video muted playsinline loop preload="none" tabindex="-1" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
     </div>
 
-    <header class="partners">
-      <p>Presented by</p>
-      <ul class="logos">
-        <li><a href="https://www.geekdom.com" target="_blank" rel="noopener"><img src="assets/logos/geekdom.svg" alt="Geekdom" width="76" height="29"></a></li>
-        <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img src="assets/logos/port-san-antonio.svg" alt="Port San Antonio" width="82" height="36"></a></li>
-        <li><a href="https://satechbloc.com/" target="_blank" rel="noopener"><img src="assets/logos/techbloc.svg" alt="Tech Bloc" width="56" height="36"></a></li>
-        <li><a href="https://velocitytx.org" target="_blank" rel="noopener"><img src="assets/logos/velocitytx.svg" alt="VelocityTX" width="61" height="42"></a></li>
-      </ul>
-    </header>
-
-    <main>
-      <div class="space-top" aria-hidden="true"></div>
-
-      <section class="countdown-group" aria-label="Countdown to the event">
-        <div class="countdown" aria-hidden="true">
-          <div class="unit"><span class="unit-label">Days</span><span class="unit-value" data-unit>--</span></div>
-          <div class="unit"><span class="unit-label">Hrs</span><span class="unit-value" data-unit>--</span></div>
-          <div class="unit"><span class="unit-label">Mins</span><span class="unit-value" data-unit>--</span></div>
-          <div class="unit"><span class="unit-label">Sec</span><span class="unit-value" data-unit>--</span></div>
-        </div>
-        <p class="visually-hidden" id="countdown-text"></p>
-        <p class="when"><time datetime="2026-11-04T08:00-06:00">Nov 04, 2026 · 8–10 AM</time><br>Texas Public Radio · San Antonio</p>
-      </section>
-      <script>
-        // Counts down to Nov 4, 2026, 8:00 AM America/Chicago (CST, UTC−6): 2026-11-04T08:00:00-06:00.
-        // Runs inline so the first values are in place before first paint.
-        (function () {
-          var target = Date.UTC(2026, 10, 4, 14, 0);
-          var cells = document.querySelectorAll("[data-unit]");
-          var spoken = document.getElementById("countdown-text");
-          var lastMinute = -1;
-          function pad(n) { return n < 10 ? "0" + n : String(n); }
-          function tick() {
-            var ms = Math.max(0, target - Date.now());
-            var s = Math.floor(ms / 1000);
-            var values = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
-            for (var i = 0; i < cells.length; i++) {
-              var text = pad(values[i]);
-              if (cells[i].textContent !== text) cells[i].textContent = text;
-            }
-            // Screen readers get a per-minute summary rather than every second.
-            var minute = Math.floor(s / 60);
-            if (minute !== lastMinute) {
-              lastMinute = minute;
-              spoken.textContent = ms > 0
-                ? values[0] + " days, " + values[1] + " hours and " + values[2] + " minutes until the event."
-                : "The event has started.";
-            }
-            if (ms > 0) setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
-          }
-          tick();
-        })();
-      </script>
-
-      <div class="space-mid" aria-hidden="true"></div>
-
-      <div class="intro-group">
-        <div class="intro">
-          <p>San Antonio has never had a shared baseline for its innovation economy.</p>
-          <p>On November 4, that changes.</p>
-          <h1>San Antonio &amp; The State of Innovation.</h1>
-        </div>
-        <a class="cta" href="https://loom.ly/mrnXpL4" target="_blank" rel="noopener"><span>RSVP — FREE</span></a>
+    <div class="hero-inner">
+      <div class="topbar">
+        <ul class="mini-logos" aria-label="Presented by" data-blur-in-items>
+          <li><a href="https://www.geekdom.com" target="_blank" rel="noopener"><img class="l-geekdom" src="/assets/logos/geekdom.svg" alt="Geekdom" width="76" height="29"></a></li>
+          <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener"><img class="l-port" src="/assets/logos/port-san-antonio.svg" alt="Port San Antonio" width="82" height="36"></a></li>
+          <li><a href="https://satechbloc.com/" target="_blank" rel="noopener"><img class="l-techbloc" src="/assets/logos/techbloc.svg" alt="Tech Bloc" width="56" height="36"></a></li>
+          <li><a href="https://velocitytx.org" target="_blank" rel="noopener"><img class="l-velocity" src="/assets/logos/velocitytx.svg" alt="VelocityTX" width="61" height="42"></a></li>
+        </ul>
+        <button class="motion-toggle glass" type="button" data-glass aria-label="Pause animations" data-state="playing" hidden>
+          <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.75 3.1875H15C14.6519 3.1875 14.3181 3.32578 14.0719 3.57192C13.8258 3.81806 13.6875 4.1519 13.6875 4.5V19.5C13.6875 19.8481 13.8258 20.1819 14.0719 20.4281C14.3181 20.6742 14.6519 20.8125 15 20.8125H18.75C19.0981 20.8125 19.4319 20.6742 19.6781 20.4281C19.9242 20.1819 20.0625 19.8481 20.0625 19.5V4.5C20.0625 4.1519 19.9242 3.81806 19.6781 3.57192C19.4319 3.32578 19.0981 3.1875 18.75 3.1875ZM18.9375 19.5C18.9375 19.5497 18.9177 19.5974 18.8826 19.6326C18.8474 19.6677 18.7997 19.6875 18.75 19.6875H15C14.9503 19.6875 14.9026 19.6677 14.8674 19.6326C14.8323 19.5974 14.8125 19.5497 14.8125 19.5V4.5C14.8125 4.45027 14.8323 4.40258 14.8674 4.36742C14.9026 4.33225 14.9503 4.3125 15 4.3125H18.75C18.7997 4.3125 18.8474 4.33225 18.8826 4.36742C18.9177 4.40258 18.9375 4.45027 18.9375 4.5V19.5ZM9 3.1875H5.25C4.9019 3.1875 4.56806 3.32578 4.32192 3.57192C4.07578 3.81806 3.9375 4.1519 3.9375 4.5V19.5C3.9375 19.8481 4.07578 20.1819 4.32192 20.4281C4.56806 20.6742 4.9019 20.8125 5.25 20.8125H9C9.3481 20.8125 9.68194 20.6742 9.92808 20.4281C10.1742 20.1819 10.3125 19.8481 10.3125 19.5V4.5C10.3125 4.1519 10.1742 3.81806 9.92808 3.57192C9.68194 3.32578 9.3481 3.1875 9 3.1875ZM9.1875 19.5C9.1875 19.5497 9.16775 19.5974 9.13258 19.6326C9.09742 19.6677 9.04973 19.6875 9 19.6875H5.25C5.20027 19.6875 5.15258 19.6677 5.11742 19.6326C5.08225 19.5974 5.0625 19.5497 5.0625 19.5V4.5C5.0625 4.45027 5.08225 4.40258 5.11742 4.36742C5.15258 4.33225 5.20027 4.3125 5.25 4.3125H9C9.04973 4.3125 9.09742 4.33225 9.13258 4.36742C9.16775 4.40258 9.1875 4.45027 9.1875 4.5V19.5Z"/></svg>
+          <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.125" stroke-linejoin="round" d="M6.94 4.37a.56.56 0 0 0-.85.48v14.3a.56.56 0 0 0 .85.48l11.6-7.15a.56.56 0 0 0 0-.96Z"/></svg>
+        </button>
       </div>
 
-      <div class="space-end" aria-hidden="true"></div>
-    </main>
+      <div class="space-a" aria-hidden="true"></div>
 
-    <button class="motion-toggle" type="button" aria-label="Pause background animation" data-state="playing" hidden>
-      <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path fill="currentColor" stroke="currentColor" stroke-width="1.25" d="M6 18.4V5.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v12.8a.6.6 0 0 1-.6.6H6.6a.6.6 0 0 1-.6-.6Zm8 0V5.6a.6.6 0 0 1 .6-.6h2.8a.6.6 0 0 1 .6.6v12.8a.6.6 0 0 1-.6.6h-2.8a.6.6 0 0 1-.6-.6Z"/>
-      </svg>
-      <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M6.906 4.537A.6.6 0 0 0 6 5.053v13.894a.6.6 0 0 0 .906.516l11.723-6.947a.6.6 0 0 0 0-1.032z"/>
-      </svg>
-    </button>
-  </div>
+      <div class="hero-copy">
+        <h1 class="title" data-blur-in>
+          <span class="year">2026</span>
+          <span>San Antonio</span>
+          <span>State of</span>
+          <span>Innovation</span>
+        </h1>
+        <p class="subtitle trim" data-blur-in-block>A regional baseline for growth, investment and action</p>
+      </div>
 
-  <script src="assets/ribbon.js"></script>
-  <script src="assets/glass.js" defer></script>
+      <div class="space-b" aria-hidden="true"></div>
+
+      <form class="download" data-download novalidate aria-labelledby="dl-hero-title">
+        <p class="download-title trim" id="dl-hero-title">Download report</p>
+        <div class="field glass" data-glass>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#fff" d="M21 4.6875H3C2.85082 4.6875 2.70774 4.74676 2.60225 4.85225C2.49676 4.95774 2.4375 5.10082 2.4375 5.25V18C2.4375 18.3481 2.57578 18.6819 2.82192 18.9281C3.06806 19.1742 3.4019 19.3125 3.75 19.3125H20.25C20.5981 19.3125 20.9319 19.1742 21.1781 18.9281C21.4242 18.6819 21.5625 18.3481 21.5625 18V5.25C21.5625 5.10082 21.5032 4.95774 21.3977 4.85225C21.2923 4.74676 21.1492 4.6875 21 4.6875ZM12 12.7369L4.44562 5.8125H19.5544L12 12.7369ZM9.53156 12L3.5625 17.4713V6.52875L9.53156 12ZM10.3641 12.7631L11.625 13.9144C11.7287 14.0092 11.8641 14.0619 12.0047 14.0619C12.1452 14.0619 12.2807 14.0092 12.3844 13.9144L13.6406 12.7631L19.5544 18.1875H4.44656L10.3641 12.7631ZM14.4684 12L20.4375 6.52875V17.4713L14.4684 12Z"/></svg>
+          <label class="sr-only" for="email-hero">Business email</label>
+          <input id="email-hero" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Business email" required aria-describedby="dl-hero-msg">
+          <button type="submit" aria-label="Download report">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.6475 12.3981L13.8975 19.1481C13.7909 19.2475 13.6498 19.3016 13.5041 19.299C13.3584 19.2964 13.2193 19.2374 13.1163 19.1343C13.0132 19.0313 12.9542 18.8922 12.9516 18.7465C12.949 18.6008 13.0031 18.4597 13.1025 18.3531L18.8916 12.5631H3.75C3.60082 12.5631 3.45774 12.5039 3.35225 12.3984C3.24676 12.2929 3.1875 12.1498 3.1875 12.0006C3.1875 11.8514 3.24676 11.7084 3.35225 11.6029C3.45774 11.4974 3.60082 11.4381 3.75 11.4381H18.8916L13.1025 5.64812C13.0031 5.54149 12.949 5.40045 12.9516 5.25473C12.9542 5.109 13.0132 4.96996 13.1163 4.8669C13.2193 4.76384 13.3584 4.70481 13.5041 4.70224C13.6498 4.69966 13.7909 4.75376 13.8975 4.85312L20.6475 11.6031C20.7528 11.7086 20.812 11.8516 20.812 12.0006C20.812 12.1497 20.7528 12.2926 20.6475 12.3981Z"/></svg>
+          </button>
+        </div>
+        <p class="download-msg" id="dl-hero-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== Presented by ===================== -->
+    <section class="section consortium" aria-labelledby="consortium-title">
+      <div class="wrap">
+        <div class="split">
+          <div class="heading">
+            <p class="eyebrow trim" data-blur-in-block>Presented by</p>
+            <h2 id="consortium-title" data-blur-in>The Innovation SATX Consortium</h2>
+          </div>
+          <div class="logos-strip">
+            <div class="strip partner-logos" data-strip data-blur-in-items>
+              <ul class="strip-track" role="list">
+                <li><a href="https://www.geekdom.com" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/geekdom.svg" alt="Geekdom" style="--h: 28.5px; --r: 0.1036" width="76" height="29"></a></li>
+                <li><a href="https://www.portsanantonio.us" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/port-san-antonio.svg" alt="Port San Antonio" style="--h: 35.9px; --r: 0.1305" width="82" height="36"></a></li>
+                <li><a href="https://satechbloc.com/" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/techbloc.svg" alt="Tech Bloc" style="--h: 35.3px; --r: 0.1284" width="56" height="36"></a></li>
+                <li><a href="https://velocitytx.org" target="_blank" rel="noopener" data-cursor><img src="/assets/logos/velocitytx.svg" alt="VelocityTX" style="--h: 41.3px; --r: 0.1502" width="61" height="42"></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Why this report ===================== -->
+    <section class="section quote" aria-labelledby="quote-title">
+      <div class="wrap">
+        <div class="split">
+          <h2 id="quote-title" data-blur-in><span>The next chapter</span> <span>is about broadening</span> <span>that growth</span></h2>
+          <figure class="figure-reset">
+            <blockquote>
+              <p class="prose trim" data-blur-in-block>San Antonio has built a large, diverse and growing economy. The challenge before us is not simply to continue that growth, but to broaden it in ways that create greater opportunity, productivity and prosperity for the region.</p>
+            </blockquote>
+            <figcaption class="trim" data-blur-in-block>— The Innovation SATX Consortium</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Inside the Report ===================== -->
+    <section class="section inside" aria-labelledby="inside-title">
+      <!-- Background band ("Midwave", Figma 326:495): sits behind every section's content and
+           may bleed past this section's top and bottom. -->
+      <div class="midwave" aria-hidden="true">
+        <picture>
+          <source type="image/avif" srcset="/report/assets/midwave-1600.avif 1600w, /report/assets/midwave-2560.avif 2560w, /report/assets/midwave-3600.avif 3600w" sizes="max(1480px, 115vw)">
+          <img src="/report/assets/midwave-1600.webp" srcset="/report/assets/midwave-1600.webp 1600w, /report/assets/midwave-2560.webp 2560w, /report/assets/midwave-3600.webp 3600w" sizes="max(1480px, 115vw)" alt="" width="4000" height="2609" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <div class="wrap">
+        <div class="split">
+          <h2 id="inside-title" data-blur-in>Inside the Report</h2>
+          <p class="intro prose trim" data-blur-in-block>A first look at the numbers shaping San Antonio’s innovation economy.</p>
+        </div>
+        <ul class="stats" role="list">
+          <li class="stat">
+            <h3>Innovation Jobs</h3>
+            <p class="stat-value trim"><span class="sr-only">55,054</span><span class="stat-count" aria-hidden="true" data-to="55054" data-from="10000" data-decimals="0" data-group>55,054</span></p>
+            <p class="stat-meta">
+              <span class="change up" aria-hidden="true">+2.5%<svg viewBox="0 0 12 12"><path d="M3 9 9 3M4.2 3H9v4.8" fill="none" stroke="currentColor" stroke-width="1"/></svg></span>
+              <span aria-hidden="true">vs 53,703 in 2024</span>
+              <span class="sr-only">Up 2.5% from 53,703 in 2024.</span>
+            </p>
+            <div class="stat-body">
+              <p class="stat-desc" data-blur-in-block>Total jobs across the report’s nine defined innovation-intensive sectors.</p>
+            </div>
+          </li>
+          <li class="stat">
+            <h3>Active Federal R&amp;D Contracts</h3>
+            <p class="stat-value trim"><span class="sr-only">$2.55B</span><span class="stat-count" aria-hidden="true" data-to="2.55" data-from="1" data-decimals="2" data-prefix="$" data-suffix="B">$2.55B</span></p>
+            <p class="stat-meta">Active contracts as of September 14th, 2026</p>
+            <div class="stat-body">
+              <p class="stat-desc" data-blur-in-block>Federal R&amp;D obligations across qualifying active contracts with a primary place of performance in San Antonio. Reflects contract value, not annual expenditures.</p>
+            </div>
+          </li>
+          <li class="stat">
+            <h3>Venture Capital Investments</h3>
+            <p class="stat-value trim"><span class="sr-only">$31M</span><span class="stat-count" aria-hidden="true" data-to="31" data-from="10" data-decimals="0" data-prefix="$" data-suffix="M">$31M</span></p>
+            <p class="stat-meta">
+              <span class="change down" aria-hidden="true">−78%<svg viewBox="0 0 12 12"><path d="M3 3 9 9M9 4.2V9H4.2" fill="none" stroke="currentColor" stroke-width="1"/></svg></span>
+              <span aria-hidden="true">vs $141.05M in 2024</span>
+              <span class="sr-only">Down 78% from $141.05M in 2024.</span>
+            </p>
+            <div class="stat-body">
+              <p class="stat-desc" data-blur-in-block>Venture funding recorded for regional companies in Crunchbase.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== greater:SATX ===================== -->
+    <section class="section greater" aria-labelledby="greater-title">
+      <div class="wrap">
+        <div class="split">
+          <div class="badge" data-blur-in-block><img src="/report/assets/greater-satx.svg" alt="greater:SATX" width="88" height="44"></div>
+          <div class="text">
+            <h2 id="greater-title" data-blur-in>Supporting SATX Innovation</h2>
+            <p class="prose trim" data-blur-in-block>greater:SATX is a public-private economic development organization supporting San Antonio’s economic growth. As the study’s data partner, it validates the methodology against national best practices and independently verifies the underlying data.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Sponsors ===================== -->
+    <section class="section sponsors" aria-labelledby="sponsors-title">
+      <div class="wrap">
+        <h2 id="sponsors-title" data-blur-in>Thank you to our sponsors</h2>
+        <div class="strip sponsor-logos" data-strip data-blur-in-items>
+          <ul class="strip-track" role="list">
+            <li><img src="/report/assets/sponsors/aprio.png" alt="Aprio" style="--h: 46px" width="104" height="46"></li>
+            <li><img src="/report/assets/sponsors/frost.png" alt="Frost" style="--h: 46px" width="117" height="46"></li>
+            <li><img src="/report/assets/sponsors/whiting-turner.png" alt="Whiting-Turner" style="--h: 74px" width="101" height="74"></li>
+            <li><img src="/report/assets/sponsors/documation.png" alt="Documation" style="--h: 39px" width="136" height="39"></li>
+            <li><img src="/report/assets/sponsors/genesis.png" alt="Genesis Wealth Management" style="--h: 74px" width="102" height="74"></li>
+            <li><img src="/report/assets/sponsors/texas-partners-bank.png" alt="Texas Partners Bank" style="--h: 62px" width="132" height="62"></li>
+            <li><img src="/report/assets/sponsors/tia-group.png" alt="TIA Group" style="--h: 74px" width="103" height="74"></li>
+            <li><img src="/report/assets/sponsors/hancock-whitney.png" alt="Hancock Whitney Bank" style="--h: 74px" width="82" height="74"></li>
+            <li><img src="/report/assets/sponsors/greater-satx.svg" alt="greater:SATX" style="--h: 44px" width="88" height="44"></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== Closing download ===================== -->
+  <footer class="closing has-ribbon">
+    <div class="ribbon" aria-hidden="true">
+      <picture>
+        <source media="(max-aspect-ratio: 5/8)" type="image/avif"
+                srcset="/assets/media/ribbon-mobile-540.avif 540w, /assets/media/ribbon-mobile-810.avif 810w" sizes="100vw">
+        <source media="(max-aspect-ratio: 5/8)" type="image/webp"
+                srcset="/assets/media/ribbon-mobile-540.webp 540w, /assets/media/ribbon-mobile-810.webp 810w" sizes="100vw">
+        <source type="image/avif" srcset="/assets/media/ribbon-desktop-1280.avif 1280w, /assets/media/ribbon-desktop-1920.avif 1920w, /assets/media/ribbon-desktop-2560.avif 2560w" sizes="100vw">
+        <source type="image/webp" srcset="/assets/media/ribbon-desktop-1280.webp 1280w, /assets/media/ribbon-desktop-1920.webp 1920w, /assets/media/ribbon-desktop-2560.webp 2560w" sizes="100vw">
+        <img src="/assets/media/ribbon-desktop-1920.webp" alt="" width="2560" height="1440" loading="lazy">
+      </picture>
+      <video muted playsinline loop preload="none" tabindex="-1" disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"></video>
+    </div>
+    <div class="wrap">
+      <form class="download" data-download novalidate aria-labelledby="dl-foot-title">
+        <p class="download-title trim" id="dl-foot-title">Download report</p>
+        <div class="dock-slot">
+        <div class="dock" data-dock>
+        <div class="field glass" data-glass>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#fff" d="M21 4.6875H3C2.85082 4.6875 2.70774 4.74676 2.60225 4.85225C2.49676 4.95774 2.4375 5.10082 2.4375 5.25V18C2.4375 18.3481 2.57578 18.6819 2.82192 18.9281C3.06806 19.1742 3.4019 19.3125 3.75 19.3125H20.25C20.5981 19.3125 20.9319 19.1742 21.1781 18.9281C21.4242 18.6819 21.5625 18.3481 21.5625 18V5.25C21.5625 5.10082 21.5032 4.95774 21.3977 4.85225C21.2923 4.74676 21.1492 4.6875 21 4.6875ZM12 12.7369L4.44562 5.8125H19.5544L12 12.7369ZM9.53156 12L3.5625 17.4713V6.52875L9.53156 12ZM10.3641 12.7631L11.625 13.9144C11.7287 14.0092 11.8641 14.0619 12.0047 14.0619C12.1452 14.0619 12.2807 14.0092 12.3844 13.9144L13.6406 12.7631L19.5544 18.1875H4.44656L10.3641 12.7631ZM14.4684 12L20.4375 6.52875V17.4713L14.4684 12Z"/></svg>
+          <label class="sr-only" for="email-foot">Business email</label>
+          <input id="email-foot" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Business email" required aria-describedby="dl-foot-msg">
+          <button type="submit" aria-label="Download report">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.6475 12.3981L13.8975 19.1481C13.7909 19.2475 13.6498 19.3016 13.5041 19.299C13.3584 19.2964 13.2193 19.2374 13.1163 19.1343C13.0132 19.0313 12.9542 18.8922 12.9516 18.7465C12.949 18.6008 13.0031 18.4597 13.1025 18.3531L18.8916 12.5631H3.75C3.60082 12.5631 3.45774 12.5039 3.35225 12.3984C3.24676 12.2929 3.1875 12.1498 3.1875 12.0006C3.1875 11.8514 3.24676 11.7084 3.35225 11.6029C3.45774 11.4974 3.60082 11.4381 3.75 11.4381H18.8916L13.1025 5.64812C13.0031 5.54149 12.949 5.40045 12.9516 5.25473C12.9542 5.109 13.0132 4.96996 13.1163 4.8669C13.2193 4.76384 13.3584 4.70481 13.5041 4.70224C13.6498 4.69966 13.7909 4.75376 13.8975 4.85312L20.6475 11.6031C20.7528 11.7086 20.812 11.8516 20.812 12.0006C20.812 12.1497 20.7528 12.2926 20.6475 12.3981Z"/></svg>
+          </button>
+        </div>
+        <p class="download-msg" id="dl-foot-msg" role="status" aria-live="polite"></p>
+        </div>
+        </div>
+      </form>
+    </div>
+  </footer>
+
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <!-- ===================== Details modal (after the email step) ===================== -->
+  <dialog class="details" id="details" aria-labelledby="details-title">
+    <div class="details-panel glass" data-glass="0.55" data-glass-radius="28">
+      <form class="details-form" id="details-form" novalidate>
+        <h2 class="details-title" id="details-title">Almost there</h2>
+
+        <fieldset class="details-field" data-required>
+          <legend>Where do you work?</legend>
+          <div class="segmented">
+            <label><input type="radio" name="workplace" value="Remote"><span>Remote</span></label>
+            <label><input type="radio" name="workplace" value="In office"><span>In office</span></label>
+          </div>
+        </fieldset>
+
+        <div class="details-field">
+          <label for="d-company">Company</label>
+          <input class="details-input" id="d-company" name="company" type="text" autocomplete="organization" required>
+        </div>
+
+        <div class="details-field">
+          <span class="field-label" id="age-label">Age</span>
+          <div class="dropdown" data-dropdown>
+            <input type="hidden" name="age" id="d-age">
+            <button type="button" class="details-input dropdown-trigger" id="d-age-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="age-list" aria-labelledby="age-label d-age-btn">
+              <span class="dropdown-value is-placeholder">Select</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="dropdown-list" id="age-list" role="listbox" tabindex="-1" aria-labelledby="age-label" hidden>
+              <li role="option" id="age-opt-0" aria-selected="false">Under 25<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-1" aria-selected="false">25–34<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-2" aria-selected="false">35–44<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-3" aria-selected="false">45–54<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-4" aria-selected="false">55–64<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-5" aria-selected="false">65 or older<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+              <li role="option" id="age-opt-6" aria-selected="false">Prefer not to say<svg class="check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="details-row">
+          <div class="details-field">
+            <label for="d-first">First name</label>
+            <input class="details-input" id="d-first" name="firstName" type="text" autocomplete="given-name" required>
+          </div>
+          <div class="details-field">
+            <label for="d-last">Last name</label>
+            <input class="details-input" id="d-last" name="lastName" type="text" autocomplete="family-name" required>
+          </div>
+        </div>
+
+        <p class="sr-only" id="details-error" role="status" aria-live="polite"></p>
+        <button class="details-submit" type="submit">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4.8525 10.8975C4.75314 10.7909 4.69905 10.6498 4.70162 10.5041C4.70419 10.3584 4.76322 10.2193 4.86628 10.1163C4.96934 10.0132 5.10838 9.95419 5.25411 9.95162C5.39983 9.94905 5.54087 10.0031 5.6475 10.1025L11.4375 15.8916V3C11.4375 2.85082 11.4968 2.70774 11.6023 2.60225C11.7077 2.49676 11.8508 2.4375 12 2.4375C12.1492 2.4375 12.2923 2.49676 12.3977 2.60225C12.5032 2.70774 12.5625 2.85082 12.5625 3V15.8916L18.3525 10.1025C18.4591 10.0031 18.6002 9.94905 18.7459 9.95162C18.8916 9.95419 19.0307 10.0132 19.1337 10.1163C19.2368 10.2193 19.2958 10.3584 19.2984 10.5041C19.301 10.6498 19.2469 10.7909 19.1475 10.8975L12.3975 17.6475C12.292 17.7528 12.1491 17.812 12 17.812C11.8509 17.812 11.708 17.7528 11.6025 17.6475L4.8525 10.8975ZM20.25 19.6875H3.75C3.60082 19.6875 3.45774 19.7468 3.35225 19.8523C3.24676 19.9577 3.1875 20.1008 3.1875 20.25C3.1875 20.3992 3.24676 20.5423 3.35225 20.6477C3.45774 20.7532 3.60082 20.8125 3.75 20.8125H20.25C20.3992 20.8125 20.5423 20.7532 20.6477 20.6477C20.7532 20.5423 20.8125 20.3992 20.8125 20.25C20.8125 20.1008 20.7532 19.9577 20.6477 19.8523C20.5423 19.7468 20.3992 19.6875 20.25 19.6875Z"/></svg>
+          <span>Download report</span>
+        </button>
+      </form>
+
+      <div class="details-done" id="details-done" hidden tabindex="-1">
+        <h2 class="details-title" id="details-done-title">Thank you</h2>
+        <p class="details-sub" id="details-done-text"></p>
+        <button class="details-submit" type="button" data-close><span>Done</span></button>
+      </div>
+
+      <button class="details-close" type="button" aria-label="Close" data-close>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </dialog>
+
+  <script src="/report/assets/blur-in.js"></script>
+  <script src="/report/assets/report.js"></script>
+  <script src="/report/assets/report-glass.js" defer></script>
 </body>
 </html>
