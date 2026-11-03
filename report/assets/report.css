@@ -15,7 +15,6 @@
 
 :root {
   --black: #000;
-  --ink-quote: #050505;
   --card: #141414;
   --heading: #f5f6f2;
   --muted: #a5a5a5;
@@ -619,7 +618,9 @@ html.modal-open { overflow: hidden; }
 .bi-in .bi-word,
 .bi-in .bi-item,
 .bi-block.bi-in,
-.stat-meta.meta-wait.meta-in { opacity: 1; transform: none; filter: blur(0); }
+/* End states use filter: none (not blur(0)): Safari keeps a filtered element as a cached,
+   low-resolution layer, which made logos inside the moving marquee look soft. */
+.stat-meta.meta-wait.meta-in { opacity: 1; transform: none; filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .ribbon video { transition: none; }
