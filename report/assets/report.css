@@ -370,6 +370,24 @@ button, input { font: inherit; color: inherit; }
 .greater .badge img { width: 52.7%; height: auto; }
 .greater h2 { margin-top: 24px; }
 .greater .prose { margin-top: 32px; color: rgb(255 255 255 / 0.75); }
+/* Figma 350:10: outlined pill under the copy, opens the event presentation. */
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 8px 16px;
+  border: 1px solid #fff;
+  border-radius: 99px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.pill-link svg { flex: none; width: 16px; height: 16px; }
+.pill-link:hover { background: #fff; color: #000; }
 
 /* ---------- Sponsors ---------- */
 .sponsors .strip { margin-top: 44px; }
