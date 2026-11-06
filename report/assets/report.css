@@ -384,10 +384,11 @@ button, input { font: inherit; color: inherit; }
   line-height: 1;
   color: #fff;
   text-decoration: none;
-  transition: opacity 0.25s ease;
 }
 .pill-link svg { flex: none; width: 16px; height: 16px; }
-.pill-link:hover { opacity: 0.6; }
+/* After the Blur In reveal (.bi-in), hover fades the button; scoped so it outranks the Blur In rules. */
+.greater .pill-link.bi-in { transition: opacity 0.25s ease, transform 0.5s ease-out, filter 0.5s ease-out; }
+.greater .pill-link.bi-in:hover { opacity: 0.6; }
 
 /* ---------- Sponsors ---------- */
 .sponsors .strip { margin-top: 44px; }
