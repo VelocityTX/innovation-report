@@ -384,10 +384,10 @@ button, input { font: inherit; color: inherit; }
   line-height: 1;
   color: #fff;
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: opacity 0.25s ease;
 }
 .pill-link svg { flex: none; width: 16px; height: 16px; }
-.pill-link:hover { background: #fff; color: #000; }
+.pill-link:hover { opacity: 0.6; }
 
 /* ---------- Sponsors ---------- */
 .sponsors .strip { margin-top: 44px; }
