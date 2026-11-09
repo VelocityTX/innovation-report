@@ -10,7 +10,8 @@
   "use strict";
 
   // Set to the report PDF once it exists; until then the success state just confirms.
-  var REPORT_PDF = "/report/assets/pdf/2026-San-Antonio-State-Of-Innovation-Report.pdf";
+  var REPORT_PDF = "/report/assets/pdf/2026-San-Antonio-State-Of-Innovation-Report-2026-11-06.pdf";
+  var REPORT_NAME = "2026-San-Antonio-State-Of-Innovation-Report.pdf";   // saved under this name
 
   var root = document.documentElement;
   var compact = matchMedia("(max-aspect-ratio: 5/8)");
@@ -332,7 +333,7 @@
   function startDownload() {
     if (!REPORT_PDF) return;
     var a = document.createElement("a");
-    a.href = REPORT_PDF; a.download = ""; document.body.appendChild(a); a.click(); a.remove();
+    a.href = REPORT_PDF; a.download = REPORT_NAME; document.body.appendChild(a); a.click(); a.remove();
   }
 
   /* The download modal (Liquid Glass): confirms the download that has just started. */
